@@ -71,7 +71,7 @@ Sai.mixin({
         colorConvFunc, toHexConv,
         //i, f, p, q, t, 
         rgb, rg = /^(?=[\da-f]$)/;
-    if (SC.kindOf(hue) === SC.T_OBJECT && propHue) {
+    if (SC.typeOf(hue) === SC.T_HASH && propHue) {
         brightness = hue.b*1;
         saturation = hue.s*1;
         hue = hue.h*1;
@@ -90,10 +90,10 @@ Sai.mixin({
       else if ((3.0*colorHue) < 2) { color = temp+(bs-temp)*((2.0/3.0)-colorHue)*6.0; }
       else { color = temp; }
        
-      return ~~(255*color);
+      return Math.round(color*255);
     };
     if (saturation === 0) { 
-      red = green = blue = brightness*255;
+      red = green = blue = Math.round(brightness*255);
     } 
     else if (brightness < 0.5){
       temp2 = brightness*(1.0+saturation);
@@ -111,58 +111,21 @@ Sai.mixin({
       red = green = blue = 0;
     }
     
-    // Convert to hex
+    // Create the RGB object
     rgb = {r: red, g: green, b: blue, toString: function(){ return this.hex;} };
     
     toHexConv = function(color){
-      var colSt = (~~color).toString(16);
+      var colSt = color.toString(16);
       colSt = colSt.replace(rg, "0");
       return colSt;
     };
-    
-    // cute floor for pos nums
+  
+    // Convert to Hex
     r = toHexConv(red);
     g = toHexConv(green);
     b = toHexConv(blue);
-    rgb.hex = "#" + r + g + b;
+    rgb.hex = ("#" + r + g + b).toUpperCase();
     
     return rgb;
-    
-    // OLD CODE
-    // // shortout if zero brightness
-    // if (brightness === 0) { return {r: 0, g: 0, b: 0, hex: "#000"}; }
-    // 
-    // // convert to 0-1 range if hue/satuaration/brightness in 0-255 range
-    // if (hue > 1 || saturation > 1 || brightness > 1) {
-    //     hue /= 255;
-    //     saturation /= 255;
-    //     brightness /= 255;
-    // }
-    // 
-    // // TODO: [EG] need comments
-    // i = ~~(hue * 6);
-    // f = (hue * 6) - i;
-    // p = brightness * (1 - saturation);
-    // q = brightness * (1 - (saturation * f));
-    // t = brightness * (1 - (saturation * (1 - f)));
-    // 
-    // red = [brightness, q, p, p, t, brightness, brightness][i];
-    // green = [t, brightness, brightness, q, p, p, t][i];
-    // blue = [p, p, t, brightness, brightness, q, p][i];
-    // red *= 255;
-    // green *= 255;
-    // blue *= 255;
-    // rgb = {r: red, g: green, b: blue, toString: function(){ return this.hex;} };
-    // 
-    // // cute floor for pos nums
-    // r = (~~red).toString(16);
-    // g = (~~green).toString(16);
-    // b = (~~blue).toString(16);
-    // 
-    // r = r.replace(rg, "0");
-    // g = g.replace(rg, "0");
-    // b = b.replace(rg, "0");
-    // rgb.hex = "#" + r + g + b;
-    // return rgb;
   }
 });

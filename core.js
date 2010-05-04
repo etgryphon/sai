@@ -30,7 +30,7 @@ Sai = SC.Object.create({
     }
     else
     {
-      this._svg = YES1; 
+      this._svg = YES; 
     }
     this.vectorType = type;
   }
