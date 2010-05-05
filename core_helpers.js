@@ -64,14 +64,14 @@ Sai.mixin({
   // via easy-to-follow diagrams.
   hsb2rgb: function(hue, saturation, brightness){
     hue = hue || {};
-    var propHue = !SC.none(hue.h) && !SC.none(hue.s) && !SC.none(hue.b),
+    var propHash = !SC.none(hue.h) && !SC.none(hue.s) && !SC.none(hue.b),
         red, blue, green,
         temp1, temp2, temp3,
         r, g, b,
         colorConvFunc, toHexConv,
         //i, f, p, q, t, 
         rgb, rg = /^(?=[\da-f]$)/;
-    if (SC.typeOf(hue) === SC.T_HASH && propHue) {
+    if (SC.typeOf(hue) === SC.T_HASH && propHash) {
         brightness = hue.b*1;
         saturation = hue.s*1;
         hue = hue.h*1;
@@ -89,7 +89,8 @@ Sai.mixin({
       else if ((2.0*colorHue) < 1) { color = bs; }
       else if ((3.0*colorHue) < 2) { color = temp+(bs-temp)*((2.0/3.0)-colorHue)*6.0; }
       else { color = temp; }
-       
+      
+      if (color < 0) color*=-1; 
       return Math.round(color*255);
     };
     if (saturation === 0) { 
@@ -101,17 +102,18 @@ Sai.mixin({
       green = colorConvFunc(temp2, hue);
       blue = colorConvFunc(temp2, (hue-1.0/3.0));
     }
-    else if (brightness > 0.5){
-      temp2 = brightness+saturation - brightness*saturation;
-      red = colorConvFunc(temp2, (hue+1.0/3.0));
+    else if (brightness >= 0.5){
+      temp2 = (brightness+saturation) - (brightness*saturation);
+      red = colorConvFunc(temp2, (hue+(1.0/3.0)));
       green = colorConvFunc(temp2, hue);
-      blue = colorConvFunc(temp2, (hue-1.0/3.0));
+      blue = colorConvFunc(temp2, (hue-(1.0/3.0)));
     }
     else {
       red = green = blue = 0;
     }
     
     // Create the RGB object
+    // console.log("R: %@, G: %@, B: %@".fmt(red, green, blue));
     rgb = {r: red, g: green, b: blue, toString: function(){ return this.hex;} };
     
     toHexConv = function(color){
@@ -127,5 +129,59 @@ Sai.mixin({
     rgb.hex = ("#" + r + g + b).toUpperCase();
     
     return rgb;
+  },
+  
+  rgb2hsb: function(red, green, blue){
+    red = SC.none(red) ? {} : red;
+    var propHash = !SC.none(red.r) && !SC.none(red.g) && !SC.none(red.b),
+        colMax, colMin, maxMinPlus, maxMinMinus,
+        hue, saturation, brightness,
+        hsb, hueConvert;
+    
+    if (SC.typeOf(red) === SC.T_HASH && propHash) {
+      green = red.g*1;
+      blue = red.b*1;
+      red = red.r*1;
+    }
+    
+    // convert to 0-1 range if RGB in 0-255 range
+    if (red > 1)  red /= 255;
+    if (green > 1) green /= 255;
+    if (blue > 1) blue /= 255;
+    
+    colMax = Math.max(red,green,blue);
+    colMin = Math.min(red,green,blue);
+    maxMinPlus = colMax+colMin;
+    maxMinMinus = colMax-colMin;
+    
+    brightness = maxMinPlus/2;
+    
+    hueConvert = function(){
+      var h = 0;
+      if (red === colMax) { h = (green-blue)/maxMinPlus; }
+      if (green === colMax) { h = 2.0 + (blue-red)/maxMinPlus; }
+      if (blue === colMax) { h = 4.0 + (red-green)/maxMinPlus; }
+      return h;
+    };
+    if (colMax === colMin){
+      saturation = hue = 0;
+    } 
+    else if (brightness < 0.5 ){
+      saturation = maxMinMinus/maxMinPlus;
+      hue = hueConvert();
+    }
+    else if (brightness >= 0.5 ){
+      saturation = maxMinMinus/(2.0-maxMinPlus);
+      hue = hueConvert();
+    }
+    
+    // convert HSB to degrees,%,%
+    hue = Math.round(hue*60);
+    if (hue < 0) hue+=360;
+    saturation = Math.round(saturation*100);
+    brightness = Math.round(brightness*100);
+    hsb = {h: hue, s: saturation, b: brightness, toString: function(){return 'hsb(' + [this.h, this.s, this.b] + ')';} };
+    
+    return hsb;
   }
 });
