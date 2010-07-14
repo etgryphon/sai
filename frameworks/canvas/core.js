@@ -1,6 +1,6 @@
 /*globals Sai */
 
-Sai = SC.Object.create({
+Sai.mixin({
   
   createCanvas: function() {
     return Sai.SvgCanvas.create();

@@ -16,6 +16,9 @@ Sai = SC.Object.create({
   
   version: "0.1.0",
   vectorType: "UNK",
+  // SVG Specifics
+  svgns: null,
+  xlink: null,
   
   init: function(){
     sc_super();
@@ -30,7 +33,9 @@ Sai = SC.Object.create({
     }
     else
     {
-      this._svg = YES; 
+      this._svg = YES;
+      this.svgns = "http://www.w3.org/2000/svg";
+      this.xlink = "http://www.w3.org/1999/xlink";
     }
     this.vectorType = type;
   }
