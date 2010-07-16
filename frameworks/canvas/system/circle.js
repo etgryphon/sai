@@ -18,7 +18,7 @@ Sai.Circle = Sai.Shape.extend({
         sWidth = this.get('strokeWidth');
     if (firstTime) {
       circle = Sai.canvas_create('circle', x, y, r, fill, stroke, sWidth);
-      this._circle = circle;
+      this._element = circle;
       canvas.appendChild(circle);
     }
   }

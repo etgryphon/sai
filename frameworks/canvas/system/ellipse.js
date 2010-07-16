@@ -19,7 +19,7 @@ Sai.Ellipse = Sai.Shape.extend({
         sWidth = this.get('strokeWidth');
     if (firstTime) {
       ellipse = Sai.canvas_create('ellipse', x, y, rx, ry, fill, stroke, sWidth);
-      this._ellipse = ellipse;
+      this._element = ellipse;
       canvas.appendChild(ellipse);
     }
   }

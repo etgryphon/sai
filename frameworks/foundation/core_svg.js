@@ -38,8 +38,8 @@ Sai.mixin({
         colorStyling = Sai.convertAllToRGB({fill: fill, stroke: stroke});
     x = Math.round(x);
     y = Math.round(y);
-    rx = Math.round(x);
-    ry = Math.round(y);
+    rx = Math.round(rx);
+    ry = Math.round(ry);
     ellipse = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
     ellipse.setAttribute('cx', x);
     ellipse.setAttribute('cy', y);
