@@ -19,6 +19,8 @@ Sai.mixin({
   
   svg_circle_create: function (x, y, radius, fill, stroke, strokeWidth) {
     var circle;
+    fill = Sai.toRGB(fill);
+    stroke = Sai.toRGB(stroke);
     x = Math.round(x);
     y = Math.round(y);
     circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
