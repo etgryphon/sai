@@ -50,6 +50,25 @@ Sai.mixin({
     ellipse.setAttribute('stroke-width', '%@px'.fmt(strokeWidth));
     
     return ellipse;
+  },
+  
+  svg_rect_create: function (x, y, h, w, fill, stroke, strokeWidth){
+    var rect,
+        colorStyling = Sai.convertAllToRGB({fill: fill, stroke: stroke});
+    x = Math.round(x);
+    y = Math.round(y);
+    h = Math.round(h);
+    w = Math.round(w);
+    rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    rect.setAttribute('x', x);
+    rect.setAttribute('y', y);
+    rect.setAttribute('height', h);
+    rect.setAttribute('width', w);
+    rect.setAttribute('fill', colorStyling.fill);
+    rect.setAttribute('stroke', colorStyling.stroke);
+    rect.setAttribute('stroke-width', '%@px'.fmt(strokeWidth));
+
+    return rect;
   }
   
 });
