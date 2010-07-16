@@ -12,6 +12,7 @@ Sai.CanvasView = SC.View.extend({
     if (this.willCreateCanvas) this.willCreateCanvas();
     this.canvas = Sai.Canvas.create();
     this.renderCanvas(this.canvas, YES);
+    this.renderChildElements(this.canvas, YES);
     this.canvas.render(this, YES);
     if (this.didCreateCanvas) this.didCreateCanvas();
   },
@@ -19,6 +20,7 @@ Sai.CanvasView = SC.View.extend({
   didUpdateLayer: function() {
     if (this.willUpdateCanvas) this.willUpdateCanvas();
     this.renderCanvas(this.canvas, NO);
+    this.renderChildElements(this.canvas, NO);
     this.canvas.render(this, NO);
     if (this.didUpdateCanvas) this.didUpdateCanvas();
   },
@@ -28,22 +30,23 @@ Sai.CanvasView = SC.View.extend({
     this.canvas.destroy();
   },
   
-  willDestroyCanvas: function(canvas) {
-    
-  },
+  willDestroyCanvas: function(canvas) {},
   
-  getCanvasElementById: function(id) {
-    // TODO
-  },
+  // TODO: [EG] getCanvasElementById
+  getCanvasElementById: function(id) {},
   
-  getCanvasElementbyTarget: function(target) {
-    // TODO
-  },
+  // TODO: [EG] getCanvasElementbyTarget
+  getCanvasElementbyTarget: function(target) {},
   
   // ..........................................................
   // Override this function to do some custom stuff if you want
   // 
-  renderCanvas: function(canvas, firstTime) {
+  renderCanvas: function(canvas, firstTime) {},
+  
+  // ..........................................................
+  // generally do not overide this...
+  // 
+  renderChildElements: function(canvas, firstTime){
     var children = this.get('childElements') || [],
         elem, key, i, len;
     if (firstTime) {
