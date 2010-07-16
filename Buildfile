@@ -26,10 +26,11 @@ end
 # CORE FRAMEWORKS
 config :foundation, :required => []
 config :canvas, :required => [:foundation]
-config :graphs, :required => [:canvas]
+# config :graphs, :required => [:canvas]
 
 # WRAPPER FRAMEWORKS
-config :sai, :required => [:foundation, :canvas, :graph]
+# config :sai, :required => [:foundation, :canvas, :graph]
+config :sai, :required => [:foundation, :canvas]
 
 # SPECIAL THEMES
 # These do not require any of the built-in SproutCore frameworks

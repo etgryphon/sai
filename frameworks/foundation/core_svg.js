@@ -12,9 +12,24 @@ Sai.mixin({
     canvas = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     canvas.setAttribute('version', '1.1');
     canvas.setAttribute('baseProfile', 'full');
-    canvas.setAttribute('width', '%@px'.fmt(width);
+    canvas.setAttribute('width', '%@px'.fmt(width));
     canvas.setAttribute('height', '%@px'.fmt(height));
-    return canvas
+    return canvas;
+  },
+  
+  svg_circle_create: function (x, y, radius, fill, stroke, strokeWidth) {
+    var circle;
+    x = Math.round(x);
+    y = Math.round(y);
+    circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    circle.setAttribute('cx', x);
+    circle.setAttribute('cy', y);
+    circle.setAttribute('r', radius);
+    circle.setAttribute('fill', fill);
+    circle.setAttribute('stroke', stroke);
+    circle.setAttribute('stroke-width', '%@px'.fmt(strokeWidth));
+    
+    return circle;
   }
   
 });

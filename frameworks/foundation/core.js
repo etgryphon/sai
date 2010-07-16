@@ -38,5 +38,16 @@ Sai = SC.Object.create({
       this.xlink = "http://www.w3.org/1999/xlink";
     }
     this.vectorType = type;
+  },
+  
+  // ..........................................................
+  // General proxy function for creating Drawing Elements
+  // 
+  canvas_create: function(type){
+    var i, nArgs = [], len = arguments.length,
+        t = Sai.vectorType, fName;
+    for(i = 1; len > 1 && i < len; i++){ nArgs.push(arguments[i]); }
+    fName = '%@_%@_create'.fmt(t.toLowerCase(), type);
+    return Sai[fName].apply(Sai, nArgs);
   }
 });

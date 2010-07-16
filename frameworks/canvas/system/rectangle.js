@@ -1,6 +1,4 @@
 /*globals Sai */
-
-sc_require('core');
 sc_require('system/shape');
 
 Sai.Rectangle = Sai.Shape.extend({
