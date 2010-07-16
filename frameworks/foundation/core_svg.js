@@ -18,20 +18,38 @@ Sai.mixin({
   },
   
   svg_circle_create: function (x, y, radius, fill, stroke, strokeWidth) {
-    var circle;
-    fill = Sai.toRGB(fill);
-    stroke = Sai.toRGB(stroke);
+    var circle,
+        colorStyling = Sai.convertAllToRGB({fill: fill, stroke: stroke});
     x = Math.round(x);
     y = Math.round(y);
     circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     circle.setAttribute('cx', x);
     circle.setAttribute('cy', y);
     circle.setAttribute('r', radius);
-    circle.setAttribute('fill', fill);
-    circle.setAttribute('stroke', stroke);
+    circle.setAttribute('fill', colorStyling.fill);
+    circle.setAttribute('stroke', colorStyling.stroke);
     circle.setAttribute('stroke-width', '%@px'.fmt(strokeWidth));
     
     return circle;
+  },
+  
+  svg_ellipse_create: function (x, y, rx, ry, fill, stroke, strokeWidth){
+    var ellipse,
+        colorStyling = Sai.convertAllToRGB({fill: fill, stroke: stroke});
+    x = Math.round(x);
+    y = Math.round(y);
+    rx = Math.round(x);
+    ry = Math.round(y);
+    ellipse = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+    ellipse.setAttribute('cx', x);
+    ellipse.setAttribute('cy', y);
+    ellipse.setAttribute('rx', rx);
+    ellipse.setAttribute('ry', ry);
+    ellipse.setAttribute('fill', colorStyling.fill);
+    ellipse.setAttribute('stroke', colorStyling.stroke);
+    ellipse.setAttribute('stroke-width', '%@px'.fmt(strokeWidth));
+    
+    return ellipse;
   }
   
 });

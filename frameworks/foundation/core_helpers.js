@@ -277,6 +277,15 @@ Sai.mixin({
     return {r: -1, g: -1, b: -1, hex: "none", error: 1};
   },
   
+  convertAllToRGB: function(colorKeys){
+    colorKeys = colorKeys || {};
+    for( var key in colorKeys){
+      colorKeys[key] = Sai.toRGB(colorKeys[key]);
+    }
+    
+    return colorKeys;
+  },
+  
   // ..........................................................
   // Not sure the point of this function but will keep around 
   // for portability
