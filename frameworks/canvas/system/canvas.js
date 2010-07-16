@@ -1,12 +1,12 @@
 /*globals Sai */
 Sai.Canvas = SC.Object.extend({
-
-  elements: {},
   
-  orderedElements: [],
-
+  _elements: null,
+  _orderedElements: null,
+    
   render: function(view, firstTime) { 
-    var canvas = null, frame = view.get('frame');
+    var canvas = null, frame = view.get('frame'),
+        len = this._orderedElements.length;
     
     if (firstTime) {
       canvas = Sai.canvas_create('canvas', frame.width, frame.height);
@@ -14,8 +14,8 @@ Sai.Canvas = SC.Object.extend({
       this._canvas = canvas;
     }
     
-    for (var i = 0; i < this.orderedElements.length; i++) {
-      this.orderedElements[i].render(this, firstTime);
+    for (var i = 0; i < len; i++) {
+      this._orderedElements[i].render(this, firstTime);
     }
   }, 
   
@@ -75,9 +75,11 @@ Sai.Canvas = SC.Object.extend({
   
   _addCanvasElement: function(element, id) {
     id = id || SC.guidFor(element);
+    this._elements = this._elements || {};
+    this._orderedElements = this._orderedElements || [];
     element.set('id', id);
-    this.elements[id] = element;
-    this.orderedElements.pushObject(element);    
+    this._elements[id] = element;
+    this._orderedElements.pushObject(element);    
   }
   
 });
