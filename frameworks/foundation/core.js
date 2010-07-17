@@ -17,8 +17,8 @@ Sai = SC.Object.create({
   version: "0.1.0",
   vectorType: "UNK",
   // SVG Specifics
-  svgns: null,
-  xlink: null,
+  svgns: 'http://www.w3.org/2000/svg',
+  xlink: "http://www.w3.org/1999/xlink",
   
   init: function(){
     sc_super();

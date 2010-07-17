@@ -13,11 +13,10 @@ Sai.Circle = Sai.Shape.extend({
         x = this.get('x'),
         y = this.get('y'),
         r = this.get('radius'),
-        stroke = this.get('stroke'),
-        fill = this.get('fill'),
-        sWidth = this.get('strokeWidth');
+        attrs = this.basicAttrs();
+        
     if (firstTime) {
-      circle = Sai.canvas_create('circle', x, y, r, fill, stroke, sWidth);
+      circle = Sai.canvas_create('circle', x, y, r, attrs);
       this._element = circle;
       canvas.appendChild(circle);
     }

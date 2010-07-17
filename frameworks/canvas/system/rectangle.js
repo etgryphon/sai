@@ -15,11 +15,10 @@ Sai.Rectangle = Sai.Shape.extend({
         y = this.get('y'),
         h = this.get('height'),
         w = this.get('width'),
-        stroke = this.get('stroke'),
-        fill = this.get('fill'),
-        sWidth = this.get('strokeWidth');
+        attrs = this.basicAttrs();
+        
     if (firstTime) {
-      rect = Sai.canvas_create('rect', x, y, h, w, fill, stroke, sWidth);
+      rect = Sai.canvas_create('rect', x, y, h, w, attrs);
       this._element = rect;
       canvas.appendChild(rect);
     }

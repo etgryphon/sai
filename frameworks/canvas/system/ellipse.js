@@ -14,11 +14,10 @@ Sai.Ellipse = Sai.Shape.extend({
         y = this.get('y'),
         rx = this.get('radiusX'),
         ry = this.get('radiusY'),
-        stroke = this.get('stroke'),
-        fill = this.get('fill'),
-        sWidth = this.get('strokeWidth');
+        attrs = this.basicAttrs();
+
     if (firstTime) {
-      ellipse = Sai.canvas_create('ellipse', x, y, rx, ry, fill, stroke, sWidth);
+      ellipse = Sai.canvas_create('ellipse', x, y, rx, ry, attrs);
       this._element = ellipse;
       canvas.appendChild(ellipse);
     }
