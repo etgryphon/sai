@@ -116,8 +116,8 @@ Sai.mixin({
   // ..........................................................
   // Text API
   // 
-  svg_text_create: function (x, y, h, w, attrs){
-    var text;
+  svg_text_create: function (x, y, h, w, text, attrs){
+    var textElem, tn;
     
     // normalize basic params
     x = Math.round(x);
@@ -125,14 +125,19 @@ Sai.mixin({
     h = Math.round(h);
     w = Math.round(w);
     
-    text = document.createElementNS(this.svgns, 'text');
-    text.setAttribute('x', x);
-    text.setAttribute('y', y);
-    text.setAttribute('height', h);
-    text.setAttribute('width', w);
-    text = Sai.svg_attr_set(text, attrs);
+    textElem = document.createElementNS(this.svgns, 'text');
+    // TODO: [EG] add creation of multiline text here...
+    tn = document.createTextNode(text);
+    
+    textElem.setAttribute('x', x);
+    textElem.setAttribute('y', y);
+    textElem.setAttribute('height', h);
+    textElem.setAttribute('width', w);
+    textElem = Sai.svg_attr_set(textElem, attrs);
+    // TODO: [EG] add appending of multiline text here...
+    textElem.appendChild(tn);
 
-    return text;
+    return textElem;
   }
   
 });
