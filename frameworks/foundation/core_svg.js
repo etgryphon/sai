@@ -10,10 +10,10 @@ Sai.mixin({
   svg_canvas_create: function(width, height){
     var canvas;
     canvas = document.createElementNS(this.svgns, 'svg');
-    canvas.setAttribute('version', '1.1');
-    canvas.setAttribute('baseProfile', 'full');
-    canvas.setAttribute('width', '%@px'.fmt(width));
-    canvas.setAttribute('height', '%@px'.fmt(height));
+    canvas.setAttributeNS(null, 'version', '1.1');
+    canvas.setAttributeNS(null, 'baseProfile', 'full');
+    canvas.setAttributeNS(null, 'width', '%@px'.fmt(width));
+    canvas.setAttributeNS(null, 'height', '%@px'.fmt(height));
     return canvas;
   },
   
@@ -26,12 +26,12 @@ Sai.mixin({
     value = value || null;
     if (SC.typeOf(attrs) === SC.T_STRING){
       normVal = this._format_attr(attrs, value);
-      elem.setAttribute(attrs, normVal);
+      elem.setAttributeNS(null, attrs, normVal);
     }
     else if (SC.typeOf(attrs) === SC.T_HASH){
       for (key in attrs){
         normVal = this._format_attr(key, attrs[key]);
-        elem.setAttribute(key, normVal);
+        elem.setAttributeNS(null, key, normVal);
       }
     }
     
@@ -60,9 +60,9 @@ Sai.mixin({
     x = Math.round(x);
     y = Math.round(y);
     circle = document.createElementNS(this.svgns, 'circle');
-    circle.setAttribute('cx', x);
-    circle.setAttribute('cy', y);
-    circle.setAttribute('r', radius);
+    circle.setAttributeNS(null, 'cx', x);
+    circle.setAttributeNS(null, 'cy', y);
+    circle.setAttributeNS(null, 'r', radius);
     // set the applied attrs
     circle = Sai.svg_attr_set(circle, attrs);
     
@@ -82,10 +82,10 @@ Sai.mixin({
     ry = Math.round(ry);
     
     ellipse = document.createElementNS(this.svgns, 'ellipse');
-    ellipse.setAttribute('cx', x);
-    ellipse.setAttribute('cy', y);
-    ellipse.setAttribute('rx', rx);
-    ellipse.setAttribute('ry', ry);
+    ellipse.setAttributeNS(null, 'cx', x);
+    ellipse.setAttributeNS(null, 'cy', y);
+    ellipse.setAttributeNS(null, 'rx', rx);
+    ellipse.setAttributeNS(null, 'ry', ry);
     ellipse = Sai.svg_attr_set(ellipse, attrs);
     
     return ellipse;
@@ -104,10 +104,10 @@ Sai.mixin({
     w = Math.round(w);
     
     rect = document.createElementNS(this.svgns, 'rect');
-    rect.setAttribute('x', x);
-    rect.setAttribute('y', y);
-    rect.setAttribute('height', h);
-    rect.setAttribute('width', w);
+    rect.setAttributeNS(null, 'x', x);
+    rect.setAttributeNS(null, 'y', y);
+    rect.setAttributeNS(null, 'height', h);
+    rect.setAttributeNS(null, 'width', w);
     rect = Sai.svg_attr_set(rect, attrs);
 
     return rect;
@@ -129,15 +129,43 @@ Sai.mixin({
     // TODO: [EG] add creation of multiline text here...
     tn = document.createTextNode(text);
     
-    textElem.setAttribute('x', x);
-    textElem.setAttribute('y', y);
-    textElem.setAttribute('height', h);
-    textElem.setAttribute('width', w);
+    textElem.setAttributeNS(null, 'x', x);
+    textElem.setAttributeNS(null, 'y', y);
+    textElem.setAttributeNS(null, 'height', h);
+    textElem.setAttributeNS(null, 'width', w);
     textElem = Sai.svg_attr_set(textElem, attrs);
     // TODO: [EG] add appending of multiline text here...
     textElem.appendChild(tn);
 
     return textElem;
+  },
+  
+  svg_polygon_create: function (points, attrs){
+    var poly, polyPoints = "", isFirst = true;
+    
+    // normalize basic params
+    points = points || [];
+    
+    if (SC.typeOf(points) === SC.T_STRING){
+      polyPoints = points;
+    }
+    else if(SC.typeOf(points) === SC.T_ARRAY){
+      points.forEach( function(pt){
+        if (isFirst){
+          polyPoints = "%@,%@".fmt(pt.x, pt.y);
+          isFirst = false;
+        } 
+        else {
+          polyPoints += " %@,%@".fmt(pt.x, pt.y);
+        }
+      });
+    }
+    
+    poly = document.createElementNS(this.svgns, 'polygon');
+    poly.setAttributeNS(null, 'points', polyPoints);
+    poly = Sai.svg_attr_set(poly, attrs);
+
+    return poly;
   }
   
 });
