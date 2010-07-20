@@ -166,6 +166,26 @@ Sai.mixin({
     poly = Sai.svg_attr_set(poly, attrs);
 
     return poly;
+  },
+  
+  svg_path_create: function(path, attrs){
+    var pathElem, pathStr = "", type;
+    // normalize basic params
+    path = path || [];
+    type = SC.typeOf(path); 
+    if ( type === SC.T_STRING){
+      pathStr =  Sai.parsePathString(path);
+    }
+    else if(type === SC.T_ARRAY){
+      pathStr = Sai.parsePathString(path.join(" "));
+    }
+    
+    pathElem = document.createElementNS(this.svgns, 'path');
+    pathStr = Sai.roundPath(Sai.pathToAbsolute(pathStr));
+    pathElem.setAttributeNS(null, 'd', pathStr);
+    pathElem = Sai.svg_attr_set(pathElem, attrs);
+
+    return pathElem;
   }
   
 });

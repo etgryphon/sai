@@ -5,30 +5,25 @@ sc_require('core_helpers');
 /*globals Sai */
 Sai.mixin({
   
-  _path2string: function () {
-    var p2s = /,?([achlmqrstvxz]),?/gi; // <= TODO: [EG] performance upgrade?
-    return this.join(",").replace(p2s, "$1");
-  },
-  // ..........................................................
-  // pathClone: 
-  // Loops through and double array of paths to clone the path
-  // 
-  pathClone: function (pathArray) {
-    var res = [], i, iLen, j, jLen;
-    if (!SC.typeOf(pathArray) === SC.T_ARRAY || !(pathArray && SC.typeOf(pathArray[0]) === SC.T_ARRAY)) { // rough assumption
-      pathArray = Sai.parsePathString(pathArray);
-    }
-    for (i = 0, iLen = pathArray.length; i < iLen; i++) {
-      res[i] = [];
-      for (j = 0, jLen = pathArray[i].length; j < jLen; j++) {
-        res[i][j] = pathArray[i][j];
+  roundPath: function(path) {
+    var i, ii, j , jj, round = Math.round;
+    for (i = 0, ii = path.length; i < ii; i++) {
+      if (path[i][0].toLowerCase() !== "a") {
+        for (j = 1, jj = path[i][length]; j < jj; j++) {
+          path[i][j] = round(path[i][j]);
+        }
+      } else {
+        path[i][6] = round(path[i][6]);
+        path[i][7] = round(path[i][7]);
       }
     }
-    res.toString = Sai._path2string;
-    return res;
+    return path;
   },
   
-  
+  _path2string: function () {
+    var p2s = /,?([achlmqrstvxz]),?/gi; // <= TODO: [EG] performance upgrade?
+    return this.join(",").replace(p2s, '$1');
+  },
   
   // ..........................................................
   // parsePathString:
@@ -71,7 +66,27 @@ Sai.mixin({
   },
   
   // ..........................................................
-  // TODO: [EG] Documentation and Unit Test
+  // pathClone: 
+  // Loops through and double array of paths to clone the path
+  // 
+  pathClone: function (pathArray) {
+    var res = [], i, iLen, j, jLen;
+    if (!SC.typeOf(pathArray) === SC.T_ARRAY || !(pathArray && SC.typeOf(pathArray[0]) === SC.T_ARRAY)) { // rough assumption
+      pathArray = Sai.parsePathString(pathArray);
+    }
+    for (i = 0, iLen = pathArray.length; i < iLen; i++) {
+      res[i] = [];
+      for (j = 0, jLen = pathArray[i].length; j < jLen; j++) {
+        res[i][j] = pathArray[i][j];
+      }
+    }
+    res.toString = Sai._path2string;
+    return res;
+  },
+  
+  // ..........................................................
+  // pathToAbsolute() - this function converts a relative path
+  // to an absolute path array.
   // TODO: uses the Cacher...
   pathToAbsolute: function (pathArray) {
     if (SC.typeOf(pathArray) === SC.T_ARRAY && SC.typeOf(pathArray[0]) === SC.T_ARRAY) { // rough assumption, TODO: [EG] WTF?
@@ -95,8 +110,8 @@ Sai.mixin({
       pa = pathArray[i];
       up_pa = pa[0].toUpperCase();
       if (pa[0] !== up_pa) {
-        r[0] = pa[0];
-        switch (r[0]) {
+        r[0] = up_pa;
+        switch (up_pa) {
           case "A":
             r[1] = pa[1];
             r[2] = pa[2];
