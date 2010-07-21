@@ -82,4 +82,60 @@ test("Function: pathToAbsolute()", function() {
   equals(pAbsol, 'M600,350L650,325A25,25,-30,0,1,700,300L750,275A25,50,-30,0,1,800,250L850,225A25,75,-30,0,1,900,200L950,175A25,100,-30,0,1,1000,150L1050,125', "Elliptical Arc > Relative Path to an absolute path");
 });
 
+test("Function: path2curve()", function() {
+  var pathStr, pPath, p2c;
+  
+  // Test 1: Triangle
+  pathStr = 'M50,10 L250,10 150,185 z';
+  pPath = Sai.parsePathString(pathStr);
+  p2c = Sai.path2curve(pPath);
+  equals(p2c, 'M50,10C50,10,250,10,250,10C250,10,150,185,150,185C150,185,50,10,50,10', "Triangle: redrawing the path (\'M50,10 L250,10 150,185 z\') with curves");
+  
+  // Test 2: Abstract Path 
+  pathStr = 'M40,140 L40,100 10,100 C10,10 90,10 90,100 L60,100 60,140 M140,50 C70,180 195,180 190,100';
+  pPath = Sai.parsePathString(pathStr);
+  p2c = Sai.path2curve(pPath);
+  equals(p2c, 
+        'M40,140C40,140,40,100,40,100C40,100,10,100,10,100C10,10,90,10,90,100C90,100,60,100,60,100C60,100,60,140,60,140M140,50C70,180,195,180,190,100', 
+        "Abstract Path: redrawing (\'M40,140 L40,100 10,100 C10,10 90,10 90,100 L60,100 60,140 M140,50 C70,180 195,180 190,100\') with curves");
+  
+  // Test 2: Elliptical Arc > Relative Path
+  // pathStr = 'M600,350 l 50,-25 a25,25 -30 0,1 50,-25 l 50,-25 a25,50 -30 0,1 50,-25 l 50,-25 a25,75 -30 0,1 50,-25 l 50,-25 a25,100 -30 0,1 50,-25 l 50,-25';
+  // pPath = Sai.parsePathString(pathStr);
+  // pAbsol = Sai.pathToAbsolute(pPath);
+  // equals(pAbsol, 'M600,350L650,325A25,25,-30,0,1,700,300L750,275A25,50,-30,0,1,800,250L850,225A25,75,-30,0,1,900,200L950,175A25,100,-30,0,1,1000,150L1050,125', "Elliptical Arc > Relative Path to an absolute path");
+});
+
+test("Function: curveDim()", function() {
+  var pathStr, pPath, pDim;
+  
+  // Test 1: curve
+  pDim = Sai.curveDim(100, 140, 200, 130, 190, 40, 300, 140);
+  same(pDim, {min: {x: 100, y: 93}, max: {x: 300, y: 140}}, "Curve Dimension: should be {min: {x: 100, y: 93}, max: {x: 300, y: 140}}");
+});
+
+test("Function: pathDimensions()", function() {
+  var pathStr, pPath, pDim;
+  
+  // Test 1: Triangle
+  pathStr = 'M50,10 l200,0 -100,200 z';
+  pPath = Sai.parsePathString(pathStr);
+  pDim = Sai.pathDimensions(pPath);
+  same(pDim, {x: 50, y: 10, width: 200, height: 200}, "Triangle: dimensions are {x: 50, y: 10, width: 200, height: 200}");
+  
+  // Test 2: Abstract Path 
+  // pathStr = 'M40,140 L40,100 10,100 C10,10 90,10 90,100 L60,100 60,140 M140,50 C70,180 195,180 190,100';
+  // pPath = Sai.parsePathString(pathStr);
+  // pDim = Sai.pathDimensions(pPath);
+  // equals(pDim, 'M50,80L250,80L150,280Z', "Abstract Path: finding the dimensions of (\'M40,140 L40,100 10,100 C10,10 90,10 90,100 L60,100 60,140 M140,50 C70,180 195,180 190,100\')");
+  
+  
+  
+  // Test 2: Elliptical Arc > Relative Path
+  // pathStr = 'M600,350 l 50,-25 a25,25 -30 0,1 50,-25 l 50,-25 a25,50 -30 0,1 50,-25 l 50,-25 a25,75 -30 0,1 50,-25 l 50,-25 a25,100 -30 0,1 50,-25 l 50,-25';
+  // pPath = Sai.parsePathString(pathStr);
+  // pAbsol = Sai.pathToAbsolute(pPath);
+  // equals(pAbsol, 'M600,350L650,325A25,25,-30,0,1,700,300L750,275A25,50,-30,0,1,800,250L850,225A25,75,-30,0,1,900,200L950,175A25,100,-30,0,1,1000,150L1050,125', "Elliptical Arc > Relative Path to an absolute path");
+});
+
 

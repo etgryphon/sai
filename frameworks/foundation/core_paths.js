@@ -240,10 +240,69 @@ Sai.mixin({
     res.toString = this._path2string;
     return res;
   },
+  
+  // ..........................................................
+  // TODO: [EG] Unit Tests and Documentation
+  // 
+  curveDim: function (p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y) {
+    //debugger;
+    var a, b, c, t1, t2,
+        y = [p1y, p2y], x = [p1x, p2x],
+        dot, minVal, maxVal, 
+        round = Math.round, mmin = Math.min, mmax = Math.max;
+        
+    // Calculate X Values
+    a = (c2x - 2 * c1x + p1x) - (p2x - 2 * c2x + c1x);
+    b = 2 * (c1x - p1x) - 2 * (c2x - c1x);
+    c = p1x - c1x;
+    t1 = (-b + Math.sqrt(b * b - 4 * a * c)) / 2 / a;
+    t2 = (-b - Math.sqrt(b * b - 4 * a * c)) / 2 / a;
+        
+    if (Math.abs(t1) > 1e12) t1 = 0.5;
+    if (Math.abs(t2) > 1e12) t2 = 0.5;
+    if (t1 > 0 && t1 < 1) {
+      dot = Sai.findDotAtSegment(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, t1);
+      x.push(dot.x);
+      y.push(dot.y);
+    }
+    if (t2 > 0 && t2 < 1) {
+      dot = Sai.findDotAtSegment(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, t2);
+      x.push(dot.x);
+      y.push(dot.y);
+    }
+    
+    // Calculate the Y values
+    a = (c2y - 2 * c1y + p1y) - (p2y - 2 * c2y + c1y);
+    b = 2 * (c1y - p1y) - 2 * (c2y - c1y);
+    c = p1y - c1y;
+    t1 = (-b + Math.sqrt(b * b - 4 * a * c)) / 2 / a;
+    t2 = (-b - Math.sqrt(b * b - 4 * a * c)) / 2 / a;
+    
+    if (Math.abs(t1) > 1e12) t1 = 0.5;
+    if (Math.abs(t2) > 1e12) t2 = 0.5;
+    
+    if (t1 > 0 && t1 < 1) {
+      dot = Sai.findDotAtSegment(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, t1);
+      x.push(dot.x);
+      y.push(dot.y);
+    }
+    if (t2 > 0 && t2 < 1) {
+      dot = Sai.findDotAtSegment(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, t2);
+      x.push(dot.x);
+      y.push(dot.y);
+    }
+    
+    // Calculate the min and max values to return
+    minVal = {x: round(mmin.apply(0, x)), y: round(mmin.apply(0, y))};
+    maxVal = {x: round(mmax.apply(0, x)), y: round(mmax.apply(0, y))};
+    return { min: minVal, max: maxVal};
+  },
+  
   // ..........................................................
   // TODO: [EG] Documentation and Unit Test
   // 
   pathDimensions: function (path) {
+    var mmax = Math.max, mmin = Math.min;
     if (!path) return {x: 0, y: 0, width: 0, height: 0};
     path = Sai.path2curve(path);
     var x = 0, y = 0,
@@ -265,9 +324,9 @@ Sai.mixin({
         y = p[6];
       }
     }
-    xmin = Math.min(0, X);
-    ymin = Math.min(0, Y);
-    ret = {x: xmin, y: ymin, width: Math.max(0, X) - xmin, height: Math.max(0, Y) - ymin};
+    xmin = mmin.apply(0, X);
+    ymin = mmin.apply(0, Y);
+    ret = {x: xmin, y: ymin, width: mmax.apply(0, X) - xmin, height: mmax.apply(0, Y) - ymin};
     return ret;
   },
   
@@ -327,7 +386,8 @@ Sai.mixin({
   },
   
   // ..........................................................
-  // TODO: [EG] verify the effect of Cacher function: , null, pathClone)
+  // path2curve: this functions converts any path to its absolute
+  // equivalent purely with curves.
   // 
   path2curve: function (path, path2) {
     var i, ii, seg, seg2, seglen, seg2len,
