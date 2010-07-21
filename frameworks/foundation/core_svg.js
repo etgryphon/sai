@@ -186,6 +186,26 @@ Sai.mixin({
     pathElem = Sai.svg_attr_set(pathElem, attrs);
 
     return pathElem;
+  },
+  
+  svg_image_create: function(x, y, h, w, src, attrs){
+    var img;
+
+    // normalize basic params
+    x = Math.round(x);
+    y = Math.round(y);
+    h = Math.round(h);
+    w = Math.round(w);
+    
+    img = document.createElementNS(this.svgns, 'image');
+    img.setAttributeNS(null, 'x', x);
+    img.setAttributeNS(null, 'y', y);
+    img.setAttributeNS(null, 'height', h);
+    img.setAttributeNS(null, 'width', w);
+    img.setAttributeNS(this.xlink, "href", src);
+    rect = Sai.svg_attr_set(img, attrs);
+
+    return img;
   }
   
 });
