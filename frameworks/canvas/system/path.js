@@ -11,9 +11,8 @@ Sai.Path = Sai.Shape.extend({
         attrs = this.basicAttrs();
         
     if (firstTime) {
-      elem = Sai.canvas_create('path', path, attrs);
+      elem = Sai.canvas_create('path', canvas, path, attrs);
       this._element = elem;
-      canvas.appendChild(elem);
     }
   }
 });

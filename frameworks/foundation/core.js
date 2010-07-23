@@ -21,6 +21,7 @@ Sai = SC.Object.create({
   xlink: "http://www.w3.org/1999/xlink",
   evnts: "http://www.w3.org/2001/xml-events",
   
+  // VML Specifics  
   init: function(){
     sc_super();
     var type = (window.SVGAngle || document.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1") ? "SVG" : "VML");
@@ -31,6 +32,7 @@ Sai = SC.Object.create({
       d.innerHTML = '<!--[if vml]><br><br><![endif]-->';
       if (d.childNodes.length !== 2) { type = null; }
       else { d = null; }
+      document.createStyleSheet().addRule(".rvml", "behavior:url(#default#VML)");
     }
     else
     {

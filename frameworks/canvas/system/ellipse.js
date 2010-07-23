@@ -17,9 +17,8 @@ Sai.Ellipse = Sai.Shape.extend({
         attrs = this.basicAttrs();
 
     if (firstTime) {
-      ellipse = Sai.canvas_create('ellipse', x, y, rx, ry, attrs);
+      ellipse = Sai.canvas_create('ellipse', canvas, x, y, rx, ry, attrs);
       this._element = ellipse;
-      canvas.appendChild(ellipse);
     }
   }
   

@@ -11,9 +11,8 @@ Sai.Polygon = Sai.Shape.extend({
         attrs = this.basicAttrs();
         
     if (firstTime) {
-      poly = Sai.canvas_create('polygon', p, attrs);
+      poly = Sai.canvas_create('polygon', canvas, p, attrs);
       this._element = poly;
-      canvas.appendChild(poly);
     }
   }
   

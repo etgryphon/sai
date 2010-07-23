@@ -22,6 +22,10 @@ Sai.Text = Sai.Element.extend({
     attrs.stroke = this.get('stroke');
     attrs['stroke-width'] = this.get('strokeWidth');
     attrs['text-anchor'] = this.get('textAnchor');
+    attrs['font-size'] = 20;
+    attrs.textLength = this.get('width');
+    attrs.dy = '10 10 10 10 10 10';
+    attrs.dx = '10 10 10 10 10 10';
     
     return attrs;
   },
@@ -35,9 +39,8 @@ Sai.Text = Sai.Element.extend({
         attrs = this.basicAttrs();
 
     if (firstTime) {
-      elem = Sai.canvas_create('text', x, y, h, w, text, attrs);
+      elem = Sai.canvas_create('text', canvas, x, y, h, w, text, attrs);
       this._element = elem;
-      canvas.appendChild(elem);
     }
   }
 });

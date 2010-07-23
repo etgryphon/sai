@@ -16,9 +16,8 @@ Sai.Circle = Sai.Shape.extend({
         attrs = this.basicAttrs();
         
     if (firstTime) {
-      circle = Sai.canvas_create('circle', x, y, r, attrs);
+      circle = Sai.canvas_create('circle', canvas, x, y, r, attrs);
       this._element = circle;
-      canvas.appendChild(circle);
     }
   }
   

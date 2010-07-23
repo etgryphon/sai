@@ -18,9 +18,8 @@ Sai.Rectangle = Sai.Shape.extend({
         attrs = this.basicAttrs();
         
     if (firstTime) {
-      rect = Sai.canvas_create('rect', x, y, h, w, attrs);
+      rect = Sai.canvas_create('rect', canvas, x, y, h, w, attrs);
       this._element = rect;
-      canvas.appendChild(rect);
     }
   }
   

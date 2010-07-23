@@ -141,14 +141,10 @@ test("Function: toRGB(): General HSB String Case", function() {
 
 // ..........................................................
 // getColor() - function test
-// 
-test("Function: getColor(): Null Case ", function() {
-  equals(Sai.getColor(), '#808080', "null values, checking that null is #808080");
-  equals(Sai.getColor(), '#FFB946', "null values, checking that null is #FFB946");
-});
-
+//
 test("Function: resetColor() basic case", function() {
-  Sai.getColor()
+  Sai.resetColor();
+  equals(Sai.getColor(), '#808080', "null values, checking that null is #808080");
   equals(Sai.getColor(), '#FFB946', "2 calls the color value should be #FFB946");
   Sai.resetColor();
   equals(Sai.getColor(), '#808080', "After reset, checking that color is #808080");
