@@ -39,9 +39,7 @@ Sai.mixin({
   // by browser type...
   // 
   _getBody: function(){
-    var docum, body = this._body; 
-    if (body) return this._body;
-    
+    var docum, body; 
     try {
       docum = new window.ActiveXObject("htmlfile");
       docum.write("<body>");
@@ -50,7 +48,6 @@ Sai.mixin({
     } catch(e) {
       body = window.createPopup().document.body;
     }
-    this._body = body;
     return body;
   },
   

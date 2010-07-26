@@ -189,14 +189,15 @@ Sai.mixin({
   // ..........................................................
   // Rectangle API
   // 
-  svg_rect_create: function (canvas, x, y, h, w, attrs){
-    var rect;
+  svg_rect_create: function (canvas, x, y, h, w, cr, attrs){
+    var rect, round = Math.round;
 
     // normalize basic params
-    x = Math.round(x);
-    y = Math.round(y);
-    h = Math.round(h);
-    w = Math.round(w);
+    x = round(x);
+    y = round(y);
+    h = round(h);
+    w = round(w);
+    cr = round(cr);
     
     rect = document.createElementNS(this.svgns, 'rect');
     rect.setAttributeNS(null, 'x', x);

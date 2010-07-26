@@ -15,10 +15,11 @@ Sai.Rectangle = Sai.Shape.extend({
         y = this.get('y'),
         h = this.get('height'),
         w = this.get('width'),
+        cr = this.get('cornerRadius'),
         attrs = this.basicAttrs();
         
     if (firstTime) {
-      rect = Sai.canvas_create('rect', canvas, x, y, h, w, attrs);
+      rect = Sai.canvas_create('rect', canvas, x, y, h, w, cr, attrs);
       this._element = rect;
     }
   }

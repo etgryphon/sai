@@ -12,13 +12,13 @@ Sai.Canvas = SC.Object.extend({
     if (firstTime) {
       canvas = Sai.canvas_create('canvas', cId, frame.width, frame.height);
       this._canvas = canvas;
-    }
     
-    for (var i = 0; i < len; i++) {
-      this._orderedElements[i].render(this, firstTime);
-    }
+      for (var i = 0; i < len; i++) {
+        this._orderedElements[i].render(this, firstTime);
+      }
     
-    this.renderToView(view);
+      this.renderToView(view);
+    }
   }, 
   
   getElementByTarget: function(target) { },
@@ -30,7 +30,7 @@ Sai.Canvas = SC.Object.extend({
   },
   
   renderToView: function(view){
-    var c = this._canvas, layer = view.get('layer');
+    var elems, c = this._canvas, layer = view.get('layer');
     // For SVG, because can't do innerHTML
     if (SC.none(c.isRenderable)){
       // TODO: [EG] need to trigger the clear of the old elements 
@@ -39,7 +39,9 @@ Sai.Canvas = SC.Object.extend({
     }
     // For VML, super speed increase with innerHTML replacement
     else {
-      layer.innerHTML = c.join(' ');
+      //console.log('Render HTML:\n\n%@'.fmt(c.strings));
+      elems = c.join(' ');
+      layer.innerHTML = elems;
     }
   },
 

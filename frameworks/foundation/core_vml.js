@@ -8,7 +8,7 @@ sc_require('core_paths');
 Sai.mixin({
   
   vml_begin_node: null,
-  vml_end_node: function(elem){ elem.end(); },
+  vml_end_node: function(elem){ return elem.end(); },
   
   vml_canvas_create: function(id, width, height){
     var canvas = SC.RenderContext('div').id(id), doc = document;
@@ -53,7 +53,7 @@ Sai.mixin({
     attr = attr ? attr.toLowerCase() : null;
     if (attr === 'stroke-width'){
       // TODO: [EG] more code here to do the right thing...
-      elem.attr('strokeweight', '%@'.fmt(val)); 
+      elem = elem.attr('strokeweight', '%@'.fmt(val)); 
     }
     else if (attr === 'fill'){
       nVal = Sai.toRGB(val);
@@ -62,29 +62,169 @@ Sai.mixin({
         nVal = this._gradientFill(elem, val);
       }
       else {
-        elem.attr('fillcolor', nVal); 
+        elem = elem.attr('fillcolor', nVal); 
       }
     }
     else if (attr === 'stroke'){
       nVal = Sai.toRGB(val);
-      elem.attr('strokecolor', nVal); 
+      elem = elem.attr('strokecolor', nVal); 
+    }
+    else {
+      elem = elem.attr(attr, val); 
     }
     return elem;
   },
   
   vml_circle_create: function (canvas, x, y, radius, attrs) {
-    var d = radius*2, elem,
-        c = canvas._canvas;
+    var round = Math.round, elem, d, sw = 0,
+        c = canvas._canvas, 
+        sfmt = '%@px';
         
     // normalize data
-    x = Math.round(x);
-    y = Math.round(y);
-
+    if (attrs) sw = (attrs['stroke-width'] || 0) / 2;
+    x = round(x - radius - sw);
+    y = round(y - radius - sw);
+    d = 2*round(radius);
+    
     elem = Sai.vml_begin_node(c, 'oval');
-    elem.attr('style', 'position: absolute; top: %@px; left:%@px; width:%@px; height:%@px'.fmt(x,y,d,d));
+    elem = elem.styles({position: 'absolute', top: sfmt.fmt(y), left: sfmt.fmt(x), width: sfmt.fmt(d), height: sfmt.fmt(d)});
     elem = Sai.vml_attr_set(c, elem, attrs);
-    Sai.vml_end_node(elem);
+    elem = Sai.vml_end_node(elem);
 
+    return elem;
+  },
+  
+  // ..........................................................
+  // Ellipse API
+  // 
+  vml_ellipse_create: function (canvas, x, y, rx, ry, attrs){
+    var elem, dx, dy, round = Math.round,
+        c = canvas._canvas, sfmt = '%@px';
+    
+    // normalize basic params
+    x = round(x - rx);
+    y = round(y - ry);
+    dx = 2*round(rx);
+    dy = 2*round(ry);
+    
+    elem = Sai.vml_begin_node(c, 'oval');
+    elem = elem.styles({position: 'absolute', top: sfmt.fmt(y), left: sfmt.fmt(x), width: sfmt.fmt(dx), height: sfmt.fmt(dy)});
+    elem = Sai.vml_attr_set(c, elem, attrs);
+    elem = Sai.vml_end_node(elem);
+    
+    return elem;
+  },
+  
+  // ..........................................................
+  // Rectangle API
+  // 
+  vml_rect_create: function (canvas, x, y, h, w, cr, attrs){
+    var elem, round = Math.round, 
+        sfmt = '%@px', c = canvas._canvas;
+
+    // normalize basic params
+    x = round(x);
+    y = round(y);
+    h = round(h);
+    w = round(w);
+    cr = round(cr) || 0;
+    
+    elem = Sai.vml_begin_node(c, 'roundrect');
+    attrs.arcsize = cr;
+    elem = elem.styles({position: 'absolute', top: sfmt.fmt(y), left: sfmt.fmt(x), width: sfmt.fmt(w), height: sfmt.fmt(h)});
+    elem = Sai.vml_attr_set(c, elem, attrs);
+    elem = Sai.vml_end_node(elem);
+    
+    return elem;
+  },
+  
+  // ..........................................................
+  // Text API
+  // 
+  vml_text_create: function (canvas, x, y, h, w, text, attrs){
+    var elem, tn, round = Math.round, c = canvas._canvas;
+    
+    // normalize basic params
+    x = round(x);
+    y = round(y);
+    h = round(h);
+    w = round(w);
+    
+    // TODO: [EG] VML code to make a text
+    
+    return elem;
+  },
+  
+  vml_polygon_create: function (canvas, points, attrs){
+    var elem, polyPoints = "", 
+        isFirst = true, c = canvas._canvas;
+    
+    // normalize basic params
+    points = points || [];
+    
+    if (SC.typeOf(points) === SC.T_STRING){
+      polyPoints = points;
+    }
+    else if(SC.typeOf(points) === SC.T_ARRAY){
+      points.forEach( function(pt){
+        if (isFirst){
+          polyPoints = '%@px,%@px'.fmt(pt.x, pt.y);
+          isFirst = false;
+        } 
+        else {
+          polyPoints += ' %@px,%@px'.fmt(pt.x, pt.y);
+        }
+      });
+    }
+    
+    elem = Sai.vml_begin_node(c, 'polyline');
+    attrs.points = polyPoints;
+    // TODO: [EG] check to see if needs style => elem.attr('style', 'position: absolute; top: px; left:%@px; width:%@px; height:%@px'.fmt(x,y,rx,ry));
+    elem = Sai.vml_attr_set(c, elem, attrs);
+    elem = Sai.vml_end_node(elem);
+
+    return elem;
+  },
+  
+  vml_path_create: function(canvas, path, attrs){
+    var elem, pathStr = "", 
+        c = canvas._canvas, type;
+    // normalize basic params
+    path = path || [];
+    type = SC.typeOf(path); 
+    if ( type === SC.T_STRING){
+      pathStr =  Sai.parsePathString(path);
+    }
+    else if(type === SC.T_ARRAY){
+      pathStr = Sai.parsePathString(path.join(" "));
+    }
+    pathStr = Sai.path2vml(pathStr);
+    console.log("Path: %@".fmt(pathStr));
+    elem = Sai.vml_begin_node(c, 'path');
+    attrs.path = pathStr;
+    // TODO: [EG] might need to have size: elem.attr('style', 'position: absolute; top: %@px; left:%@px; width:%@px; height:%@px'.fmt(x,y,w,h));
+    elem = Sai.vml_attr_set(c, elem, attrs);
+    elem = Sai.vml_end_node(elem);
+    
+    return elem;
+  },
+  
+  vml_image_create: function(canvas, x, y, h, w, src, attrs){
+    var elem, round = Math.round,
+        sfmt = '%@px', c = canvas._canvas;
+
+    // normalize basic params
+    x = round(x);
+    y = round(y);
+    h = round(h);
+    w = round(w);
+    
+    elem = Sai.vml_begin_node(c, 'image');
+    attrs.src = src;
+    elem = elem.styles({position: 'absolute', top: sfmt.fmt(y), left: sfmt.fmt(x), width: sfmt.fmt(w), height: sfmt.fmt(h)});
+    elem = Sai.vml_attr_set(c, elem, attrs);
+    elem = Sai.vml_end_node(elem);
+    
     return elem;
   }
   
