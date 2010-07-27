@@ -5,8 +5,12 @@ sc_require('core_helpers');
 /*globals Sai */
 Sai.mixin({
   
+  round: function(num) {
+      return + num + (~~num === num) * 0.5;
+  },
+  
   roundPath: function(path) {
-    var i, ii, j , jj, round = Math.round;
+    var i, ii, j , jj, round = Sai.round;
     for (i = 0, ii = path.length; i < ii; i++) {
       if (path[i][0].toLowerCase() !== "a") {
         for (j = 1, jj = path[i][length]; j < jj; j++) {
@@ -446,10 +450,30 @@ Sai.mixin({
   
   // VML specific arguments
   coordsize: 1e3 + " " + 1e3,
-  zoom: 10,
+  vmlZoom: 1,
+  vmlMapping: { M: "m", L: "l", C: "c", Z: "x", m: "t", l: "r", c: "v", z: "x" },
+  
+  _cmdReplace: function(all, cmd, args){
+    //debugger;
+    var res, vals = [], val = /-?[^,s-]+/g,
+        map = Sai.vmlMapping, round = Math.round,
+        isMove = cmd.toLowerCase() === "m";
+    res = map[cmd];
+    args.replace(val,
+      function(value) {
+        //debugger;
+        if (isMove && vals.length === 2) {
+          res += vals + map[cmd === "m" ? "l": "L"];
+          vals = [];
+        }
+        vals.push(round(value * Sai.vmlZoom));
+      }
+    );
+    return '%@ %@ '.fmt(res, vals);
+  },
   
   path2vml: function(path) {
-    var total = /[ahqstv]/ig,
+    var total1 = /[ahqstv]/ig, total2 = /[clmz]/g,
         map = { M: "m", L: "l", C: "c", Z: "x", m: "t", l: "r", c: "v", z: "x" },
         bites = /([clmz]),?([^clmz]*)/gi,
         val = /-?[^,s-]+/g,
@@ -458,27 +482,10 @@ Sai.mixin({
         round = Math.round,
         i, ii, j, jj;
         
-    if ((path + "").match(total)){ command = Sai.path2curve; }
-    total = /[clmz]/g; // FIXME: [EG] WTF? Why not just assign this above?
-    if (command === Sai.pathToAbsolute && !(path + "").match(total)) {
-      res = (path + "").replace(bites,
-        function(all, command, args) {
-          vals = [];
-          isMove = command.toLowerCase() === "m";
-          res = map[command];
-          args.replace(val,
-            function(value) {
-              if (isMove && vals.length === 2) {
-                res += vals + map[command === "m" ? "l": "L"];
-                vals = [];
-              }
-              vals.push(round(value * Sai.zoom));
-            }
-          );
-          return res + vals;
-        }
-      );
-      return res;
+    if ((path + "").match(total1)){ command = Sai.path2curve; }
+    if (command === Sai.pathToAbsolute && !(path + "").match(total2)) {
+      res = (path + "").replace(bites, Sai._cmdReplace);
+      return res + 'e';
     }
     pa = command(path);
     res = [];
@@ -487,10 +494,11 @@ Sai.mixin({
       r = pa[i][0].toLowerCase();
       if (r === "z") { r = "x"; }
       for (j = 1, jj = p.length; j < jj; j++) {
-        r += round(p[j] * Sai.zoom) + (j !== jj - 1 ? ",": "");
+        r += round(p[j] * Sai.vmlZoom) + (j !== jj - 1 ? ",": "");
       }
       res.push(r);
     }
+    res.push('e');
     return res.join(" ");
   }
 });

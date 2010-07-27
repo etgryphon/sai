@@ -11,8 +11,12 @@ Sai.mixin({
   vml_end_node: function(elem){ return elem.end(); },
   
   vml_canvas_create: function(id, width, height){
-    var canvas = SC.RenderContext('div').id(id), doc = document;
+    var canvas, sfmt ="%@px", doc = document;
+    
+    canvas = SC.RenderContext('div').id(id).styles({position: 'absolute', top: '0px', left: '0px', width: sfmt.fmt(width), height: sfmt.fmt(height)});
     canvas.isRenderable = YES;
+    canvas.abWidth = width;
+    canvas.abHeight = width;
     try {
       if (!doc.namespaces.rvml){ doc.namespaces.add("rvml", "urn:schemas-microsoft-com:vml"); }
       Sai.vml_begin_node = function(context, tagName) {
@@ -157,7 +161,7 @@ Sai.mixin({
   
   vml_polygon_create: function (canvas, points, attrs){
     var elem, polyPoints = "", 
-        isFirst = true, c = canvas._canvas;
+        c = canvas._canvas;
     
     // normalize basic params
     points = points || [];
@@ -167,19 +171,13 @@ Sai.mixin({
     }
     else if(SC.typeOf(points) === SC.T_ARRAY){
       points.forEach( function(pt){
-        if (isFirst){
-          polyPoints = '%@px,%@px'.fmt(pt.x, pt.y);
-          isFirst = false;
-        } 
-        else {
-          polyPoints += ' %@px,%@px'.fmt(pt.x, pt.y);
-        }
+        polyPoints += '%@px,%@px'.fmt(pt.x, pt.y);
       });
     }
-    
+    var val = polyPoints.match(/^(\d+px,\d+px)|(\d+,\d+\s+)/i) || [];
+    if (val[0]) polyPoints += ' '+val[0];
     elem = Sai.vml_begin_node(c, 'polyline');
     attrs.points = polyPoints;
-    // TODO: [EG] check to see if needs style => elem.attr('style', 'position: absolute; top: px; left:%@px; width:%@px; height:%@px'.fmt(x,y,rx,ry));
     elem = Sai.vml_attr_set(c, elem, attrs);
     elem = Sai.vml_end_node(elem);
 
@@ -187,22 +185,28 @@ Sai.mixin({
   },
   
   vml_path_create: function(canvas, path, attrs){
-    var elem, pathStr = "", 
-        c = canvas._canvas, type;
+    var elem, pVml, pPath, pDim, pType,
+        sfmt = '%@px', c = canvas._canvas,
+        zoom = Sai.vmlZoom, 
+        cWidth = c.abWidth, cHeight = c.abHeight;
     // normalize basic params
     path = path || [];
-    type = SC.typeOf(path); 
-    if ( type === SC.T_STRING){
-      pathStr =  Sai.parsePathString(path);
+    pType = SC.typeOf(path); 
+    if ( pType === SC.T_STRING){
+      pPath =  Sai.parsePathString(path);
     }
-    else if(type === SC.T_ARRAY){
-      pathStr = Sai.parsePathString(path.join(" "));
+    else if(pType === SC.T_ARRAY){
+      pPath = Sai.parsePathString(path.join(" "));
     }
-    pathStr = Sai.path2vml(pathStr);
-    console.log("Path: %@".fmt(pathStr));
-    elem = Sai.vml_begin_node(c, 'path');
-    attrs.path = pathStr;
-    // TODO: [EG] might need to have size: elem.attr('style', 'position: absolute; top: %@px; left:%@px; width:%@px; height:%@px'.fmt(x,y,w,h));
+    pVml = Sai.path2vml(pPath);
+    console.log("Path: %@".fmt(pVml));
+    
+    // Create the actual node
+    elem = Sai.vml_begin_node(c, 'shape');
+    attrs.path = pVml;
+    attrs.coordorigin = '0 0';
+    attrs.coordsize = '%@ %@'.fmt(zoom*cWidth, zoom*cHeight);
+    elem = elem.styles({position: 'absolute', top: '0px', left: '0px', width: '%@px'.fmt(cWidth), height: '%@px'.fmt(cHeight)});
     elem = Sai.vml_attr_set(c, elem, attrs);
     elem = Sai.vml_end_node(elem);
     
@@ -210,7 +214,7 @@ Sai.mixin({
   },
   
   vml_image_create: function(canvas, x, y, h, w, src, attrs){
-    var elem, round = Math.round,
+    var elem, round = Sai.round,
         sfmt = '%@px', c = canvas._canvas;
 
     // normalize basic params

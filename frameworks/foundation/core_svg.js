@@ -151,8 +151,8 @@ Sai.mixin({
   // 
   svg_circle_create: function (canvas, x, y, radius, attrs) {
     var circle;
-    x = Math.round(x);
-    y = Math.round(y);
+    x = Sai.round(x);
+    y = Sai.round(y);
     circle = document.createElementNS(this.svgns, 'circle');
     circle.setAttributeNS(null, 'cx', x);
     circle.setAttributeNS(null, 'cy', y);
@@ -170,10 +170,10 @@ Sai.mixin({
     var ellipse;
     
     // normalize basic params
-    x = Math.round(x);
-    y = Math.round(y);
-    rx = Math.round(rx);
-    ry = Math.round(ry);
+    x = Sai.round(x);
+    y = Sai.round(y);
+    rx = Sai.round(rx);
+    ry = Sai.round(ry);
     
     ellipse = document.createElementNS(this.svgns, 'ellipse');
     ellipse.setAttributeNS(null, 'cx', x);
@@ -190,7 +190,7 @@ Sai.mixin({
   // Rectangle API
   // 
   svg_rect_create: function (canvas, x, y, h, w, cr, attrs){
-    var rect, round = Math.round;
+    var rect, round = Sai.round;
 
     // normalize basic params
     x = round(x);
@@ -217,10 +217,10 @@ Sai.mixin({
     var textElem, tn;
     
     // normalize basic params
-    x = Math.round(x);
-    y = Math.round(y);
-    h = Math.round(h);
-    w = Math.round(w);
+    x = Sai.round(x);
+    y = Sai.round(y);
+    h = Sai.round(h);
+    w = Sai.round(w);
     
     textElem = document.createElementNS(this.svgns, 'text');
     // TODO: [EG] add creation of multiline text here...
@@ -292,10 +292,10 @@ Sai.mixin({
     var img;
 
     // normalize basic params
-    x = Math.round(x);
-    y = Math.round(y);
-    h = Math.round(h);
-    w = Math.round(w);
+    x = Sai.round(x);
+    y = Sai.round(y);
+    h = Sai.round(h);
+    w = Sai.round(w);
     
     img = document.createElementNS(this.svgns, 'image');
     img.setAttributeNS(null, 'x', x);

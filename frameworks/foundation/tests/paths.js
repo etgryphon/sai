@@ -146,4 +146,31 @@ test("Function: pathDimensions()", function() {
   // equals(pAbsol, 'M600,350L650,325A25,25,-30,0,1,700,300L750,275A25,50,-30,0,1,800,250L850,225A25,75,-30,0,1,900,200L950,175A25,100,-30,0,1,1000,150L1050,125', "Elliptical Arc > Relative Path to an absolute path");
 });
 
+test("Function: path2vml()", function() {
+  var pathStr, pPath, pVml;
+  
+  // Test 1: Line
+  pathStr = 'M10,10 L100,100';
+  pPath = Sai.parsePathString(pathStr);
+  debugger;
+  pVml = Sai.path2vml(pPath);
+  same(pVml, "m10,10 l100,100 e", "Line: SVG(M10,10 L100,100) from pt (10,10) to (100,100)");
+  
+  // Test 2: Abstract Path 
+  // pathStr = 'M40,140 L40,100 10,100 C10,10 90,10 90,100 L60,100 60,140 M140,50 C70,180 195,180 190,100';
+  // pPath = Sai.parsePathString(pathStr);
+  // pDim = Sai.pathDimensions(pPath);
+  // equals(pDim, 'M50,80L250,80L150,280Z', "Abstract Path: finding the dimensions of (\'M40,140 L40,100 10,100 C10,10 90,10 90,100 L60,100 60,140 M140,50 C70,180 195,180 190,100\')");
+  
+  
+  
+  // Test 2: Elliptical Arc > Relative Path
+  // pathStr = 'M600,350 l 50,-25 a25,25 -30 0,1 50,-25 l 50,-25 a25,50 -30 0,1 50,-25 l 50,-25 a25,75 -30 0,1 50,-25 l 50,-25 a25,100 -30 0,1 50,-25 l 50,-25';
+  // pPath = Sai.parsePathString(pathStr);
+  // pAbsol = Sai.pathToAbsolute(pPath);
+  // equals(pAbsol, 'M600,350L650,325A25,25,-30,0,1,700,300L750,275A25,50,-30,0,1,800,250L850,225A25,75,-30,0,1,900,200L950,175A25,100,-30,0,1,1000,150L1050,125', "Elliptical Arc > Relative Path to an absolute path");
+});
+
+
+
 

@@ -7,7 +7,7 @@ Sai.Rectangle = Sai.Shape.extend({
   y: 0,
   width: 0,
   height: 0,
-  cornerRadius: 0,
+  radius: null,
   
   render: function(canvas, firstTime) {
     var rect = null,
@@ -15,7 +15,7 @@ Sai.Rectangle = Sai.Shape.extend({
         y = this.get('y'),
         h = this.get('height'),
         w = this.get('width'),
-        cr = this.get('cornerRadius'),
+        cr = this.get('radius') || 0,
         attrs = this.basicAttrs();
         
     if (firstTime) {
