@@ -134,7 +134,7 @@ Sai.mixin({
     cr = round(cr) || 0;
     
     elem = Sai.vml_begin_node(c, 'roundrect');
-    attrs.arcsize = cr;
+    attrs.arcsize = ( + cr || 0) / Math.min(w, h); //cr;
     elem = elem.styles({position: 'absolute', top: sfmt.fmt(y), left: sfmt.fmt(x), width: sfmt.fmt(w), height: sfmt.fmt(h)});
     elem = Sai.vml_attr_set(c, elem, attrs);
     elem = Sai.vml_end_node(elem);
@@ -146,7 +146,10 @@ Sai.mixin({
   // Text API
   // 
   vml_text_create: function (canvas, x, y, h, w, text, attrs){
-    var elem, tn, round = Math.round, c = canvas._canvas;
+    var elem, tn, round = Math.round, c = canvas._canvas,
+    sfmt = '%@px', zoom = Sai.vmlZoom, anchor,
+    font, textAnchorMap = {left: 'left', middle: 'center', right: 'right'},
+    cWidth = c.abWidth, cHeight = c.abHeight;
     
     // normalize basic params
     x = round(x);
@@ -154,7 +157,25 @@ Sai.mixin({
     h = round(h);
     w = round(w);
     
-    // TODO: [EG] VML code to make a text
+    // Create the actual node
+    elem = Sai.vml_begin_node(c, 'shape');
+    attrs.coordorigin = '0 0';
+    attrs.coordsize = '%@ %@'.fmt(zoom*cWidth, zoom*cHeight);
+    elem = elem.styles({position: 'absolute', top: sfmt.fmt(y), left: sfmt.fmt(x), width: sfmt.fmt(w), height: sfmt.fmt(h)});
+    
+    // Path
+    elem = Sai.vml_begin_node(elem, 'path').attr({textpathok: 'True', v: 'm%@1,%@2 l%@3,%@2'.fmt(zoom*x, zoom*y, zoom*x+1)}).end();
+    
+    // Text path
+    elem = Sai.vml_begin_node(elem, 'textpath');
+    font = '%@px %@'.fmt(attrs['font-size'], attrs.font);
+    anchor = textAnchorMap[attrs['text-anchor'] || 'left'];
+    elem = elem.styles({font: font, 'v-text-align': anchor}).attr({string: text, on: 'True'}).end();
+    
+    // End Text wrapper
+    attrs = this._clearAttrs(attrs);
+    elem = Sai.vml_attr_set(c, elem, attrs);
+    elem = Sai.vml_end_node(elem);
     
     return elem;
   },
@@ -199,7 +220,6 @@ Sai.mixin({
       pPath = Sai.parsePathString(path.join(" "));
     }
     pVml = Sai.path2vml(pPath);
-    console.log("Path: %@".fmt(pVml));
     
     // Create the actual node
     elem = Sai.vml_begin_node(c, 'shape');
@@ -230,6 +250,18 @@ Sai.mixin({
     elem = Sai.vml_end_node(elem);
     
     return elem;
+  },
+  
+  // ..........................................................
+  // attr clearing
+  // 
+  _clearAttrs: function(attrs){
+    
+    delete attrs.font;
+    delete attrs['font-size'];
+    delete attrs['text-anchor'];
+    
+    return attrs;
   }
   
 });

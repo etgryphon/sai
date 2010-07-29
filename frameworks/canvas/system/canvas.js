@@ -39,7 +39,7 @@ Sai.Canvas = SC.Object.extend({
     }
     // For VML, super speed increase with innerHTML replacement
     else {
-      //console.log('Render HTML:\n\n%@'.fmt(c.strings));
+      console.log('Render HTML:\n\n%@'.fmt(c.strings));
       elems = c.join(' ');
       layer.innerHTML = elems;
     }
@@ -59,6 +59,20 @@ Sai.Canvas = SC.Object.extend({
     
     this._addCanvasElement(circle, id);
     return circle;
+  },
+  
+  path: function(path, attrs, id) {
+    var elem;
+    path = path || {};
+    
+    elem = path.isPath ? path : Sai.Path.create({
+      stroke: attrs.stroke,
+      strokeWidth: attrs.strokeWidth,
+      path: path
+    });
+    
+    this._addCanvasElement(elem, id);
+    return elem;
   },
   
   // rectangle: function(x, y, width, height, id) {

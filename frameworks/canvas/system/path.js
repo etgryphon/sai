@@ -2,7 +2,7 @@
 sc_require('system/shape');
 
 Sai.Path = Sai.Shape.extend({
-  
+  isPath: YES,
   path: null,
   
   render: function(canvas, firstTime) {

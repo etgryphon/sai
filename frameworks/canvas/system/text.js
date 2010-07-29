@@ -7,10 +7,10 @@ Sai.Text = Sai.Element.extend({
   y: 0,
   height: 0,
   width: 0,
-  textAnchor: 'middle',
-  //font: '',
+  textAnchor: null,
+  font: null,
   stroke: 'none',
-  strokeWidth: 5,
+  strokeWidth: null,
   fill: '#000',
   text: 'Sai.Text',
   
@@ -20,12 +20,10 @@ Sai.Text = Sai.Element.extend({
     // add the basic attrs
     attrs.fill = this.get('fill');
     attrs.stroke = this.get('stroke');
-    attrs['stroke-width'] = this.get('strokeWidth');
-    attrs['text-anchor'] = this.get('textAnchor');
-    attrs['font-size'] = 20;
-    attrs.textLength = this.get('width');
-    attrs.dy = '10 10 10 10 10 10';
-    attrs.dx = '10 10 10 10 10 10';
+    attrs['stroke-width'] = this.get('strokeWidth') || 1;
+    attrs['text-anchor'] = this.get('textAnchor') || 'left';
+    attrs['font-size'] = this.get('font') || '12';
+    attrs.font = this.get('font') || 'Helvetica, Ariel';
     
     return attrs;
   },
