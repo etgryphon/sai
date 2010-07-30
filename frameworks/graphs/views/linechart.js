@@ -39,89 +39,84 @@ Sai.LineChartView = Sai.CanvasView.extend({
   _processData: function(f, canvas, xaxis, yaxis){
     var d = this.get('data') || [],
         dAttrs = this.get('dataAttrs'), attrs,
-        xScale, yScale,
+        xScale = xaxis.coordScale, yScale = yaxis.coordScale, path,
         scaledX, scaledY, scaled, scaledData = [],
-        xmin = xaxis.min, ymin = yaxis.min, path;
-        
+        xmin = xaxis.coordMin, xmax = xaxis.coordMax,
+        ymin = yaxis.coordMin, ymax = yaxis.coordMax;
         
     // Calculate the scaling factor
-    //debugger;
-    scaledData = d;
-    // xScale = (xaxis.max - xmin)/xaxis.step; 
-    // yScale = (yaxis.max - ymin)/yaxis.step; 
-    // d.forEach( function(line){
-    //   scaled = [];
-    //   line.forEach( function(point){
-    //     scaledX = (point[0]-xmin)/xScale;
-    //     scaledY = (point[1]-ymin)/yScale;
-    //     scaled.push([scaledX, scaledY]);
-    //   });
-    //   scaledData.push(scaled);
-    // });
-    
-    // Now, actually draw the lines
-    scaledData.forEach( function(line, i){
+    d.forEach( function(line, i){
+      scaled = [];
       attrs = dAttrs[i] || {color: 'red', weight: 1};
       line.forEach( function(point, j){
+        scaledX = xmin + (point[0]*xScale);
+        scaledY = ymin - (point[1]*yScale);
         if (j > 0){
-          path += '%@,%@ '.fmt(point[0], point[1]);
+          path += '%@,%@ '.fmt(scaledX, scaledY);
         } else {
-          path = 'M%@,%@L'.fmt(point[0], point[1]);
+          path = 'M%@,%@L'.fmt(scaledX, scaledY);
         }
       });
       console.log('Line Path: ' + path);
-      
       canvas.path(path, attrs, 'line-%@'.fmt(i));
-      //canvas.path(path, {stroke: 'red', strokeWidth: 1}, 'line-%@'.fmt(i));
-    });
+    });   
   },
   
   _makeAxi: function(f, canvas){
-    var xa = this.get('xaxis') || {},
-        ya = this.get('yaxis') || {}, 
-        axis, path, buffer = 0.1,
+    var axis, path, buffer = 0.1, tCount, space,
+        xa = this.get('xaxis') || {},
         startX = f.width*buffer,
-        startY = f.height*(1.0 - buffer);
+        endX = f.width*(1.0 - buffer),
+        // Y coordinate stuff
+        ya = this.get('yaxis') || {}, yScale,
+        startY = f.height*(1.0 - buffer),
+        endY = f.height*buffer;
     // X Axis
     if (xa){
-      axis = this._makeXAxis(f, xa, startX, startY, buffer);
+      // Calculate the coordinate system
+      xa.coordMin = startX;
+      xa.coordMax = endX;
+      xa.coordScale = (endX - startX) / (xa.max - xa.min);
+      tCount = ~~((xa.max - xa.min) / xa.step);
+      space = (endX - startX)/tCount;
+      axis = this._makeAxis(startX, startY, endX, startY, xa, {direction: 'x', len: 5, count: tCount+1, space: space});
       canvas.path(axis[0], axis[1], 'x-axis');
     }
     // Y Axis
     if (ya){
-      axis = this._makeYAxis(f, ya, startX, startY, buffer);
+      ya.coordMin = startY;
+      ya.coordMax = endY;
+      ya.coordScale = (startY - endY) / (ya.max - ya.min);
+      tCount = ~~((ya.max - ya.min) / ya.step);
+      space = (startY - endY)/tCount;
+      axis = this._makeAxis(startX, startY, startX, endY, ya, {direction: 'y', len: 5, count: tCount+1, space: space});
       canvas.path(axis[0], axis[1], 'y-axis');
     }
     
     return [xa, ya];
   },
   
-  _makeXAxis: function(f, xaxis, startX, startY, buffer){
-    var path = '', endX;
-    
-    xaxis = xaxis || {};
-    endX = f.width*(1.0 - buffer);
-    
+  _makeAxis: function(sx, sy, ex, ey, axisAttrs, ticks){
+    var path, i, len, dir, tLen, space, tp, tickFunc;
+    axisAttrs = axisAttrs || {};
     // Draw the line to the end
-    path = 'M%@1,%@2L%@3,%@2'.fmt(startX, startY, endX);
-    console.log('X-Axis Path: %@'.fmt(path));
-    return [path, {stroke: xaxis.color || 'black', strokeWidth: xaxis.weight || 1}];
+    path = 'M%@,%@L%@,%@'.fmt(sx, sy, ex, ey);
+    if (ticks){
+      dir = ticks.direction;
+      tLen = ticks.len;
+      space = ticks.space;
+      tickFunc = dir === 'x' ? function(x,y){ return [x, (y+tLen), (x-space), y]; } : function(x, y){ return [(x-tLen), y, x, (y+space)]; };
+      for(i = 0, len = ticks.count; i < len; i++){
+        tp = tickFunc(ex,ey);
+        ex = tp[2];
+        ey = tp[3];
+        path += 'L%@,%@M%@,%@'.fmt(tp[0], tp[1], tp[2], tp[3]);
+      }
+    }
+    console.log('Axis Path: '+path);
+    return [path, {stroke: axisAttrs.color || 'black', strokeWidth: axisAttrs.weight || 1}];
   },
-  
-  _makeYAxis: function(f, yaxis, startX, startY, buffer){
-    var path = '', endY;
     
-    yaxis = yaxis || {};
-    endY = f.height*buffer;
-    
-    // Draw the line to the end
-    path = 'M%@1,%@2L%@1,%@3'.fmt(startX, startY, endY);
-    console.log('Y-Axis Path: %@'.fmt(path));
-    return [path, {stroke: yaxis.color || 'black', strokeWidth: yaxis.weight || 1}];
-  },
-  
-  
-  
   mouseDown: function(evt) {
     console.log(evt.target);
   }
