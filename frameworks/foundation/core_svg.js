@@ -25,10 +25,14 @@ Sai.mixin({
   svg_attr_set: function(canvas, elem, attrs, value){
     var key, normVal;
     value = value || null;
+    
+    // defaults
     if (SC.typeOf(attrs) === SC.T_STRING){
       normVal = this.svg_format_attr(elem, attrs, value);
     }
     else if (SC.typeOf(attrs) === SC.T_HASH){
+      attrs.stroke = attrs.stroke || 'none';
+      attrs.fill = attrs.fill || 'none';
       for(key in attrs){
         normVal = this.svg_format_attr(elem, key, attrs[key]);
       }
@@ -40,19 +44,20 @@ Sai.mixin({
   svg_format_attr: function(elem, attr, val){
     var nVal = val;
     attr = attr ? attr.toLowerCase() : null;
+    
     if (attr === 'stroke-width'){
       // TODO: [EG] more code here to do the right thing...
       nVal = '%@px'.fmt(val);
     }
     else if (attr === 'fill'){
-      nVal = Sai.toRGB(val);
+      nVal = Sai.toRGB(val).hex;
       // In the case where it is a gradient and not a color value
-      if (nVal.error){
-        nVal = this._gradientFill(elem, val);
-      }
+      // if (nVal.error){
+      //   nVal = this._gradientFill(elem, val);
+      // }
     }
     else if (attr === 'stroke'){
-      nVal = Sai.toRGB(val);
+      nVal = Sai.toRGB(val).hex;
     }
     elem.setAttributeNS(null, attr, nVal);
     return nVal;

@@ -3,8 +3,8 @@ sc_require('system/element');
 
 Sai.Shape = Sai.Element.extend({
   
-  fill: '#ffffff',
-  stroke: '#000000',
+  fill: null,
+  stroke: null,
   strokeWidth: 1,
   
   basicAttrs: function(attrs){
