@@ -56,7 +56,7 @@ Sai.BarChartView = Sai.AxisChartView.extend({
       xBase += xSpace;
       x = xBase - xOffset;
       if (SC.typeOf(series) === SC.T_ARRAY){
-        x -= (xaxis.count*bWidth) - ((xaxis.count-1)*bSpacing);
+        x -= ((xaxis.count*bWidth) + ((xaxis.count-1)*bSpacing))/2;
         series.forEach( function(bar, j){
           bHeight = yaxis.coordScale*bar;
           y = yaxis.coordMin-bHeight;
@@ -85,7 +85,7 @@ Sai.BarChartView = Sai.AxisChartView.extend({
         // Y coordinate stuff
         ya = this.get('yaxis') || {}, yScale,
         startY = f.height*(1.0 - buffer),
-        endY = f.height*buffer;
+        endY = f.height*buffer, dLen = d.length || 0;
     
     barGroups = this._calculateBarGroups(d, isStacked);
     // X Axis
@@ -94,10 +94,10 @@ Sai.BarChartView = Sai.AxisChartView.extend({
       xa.coordMin = startX;
       xa.coordMax = endX;
       tmp = (endX - startX);
-      xa.space =  ~~(tmp / barGroups[0]);
+      xa.space =  ~~(tmp / dLen);
       xa.offset = 0.5;
       xa.count = barGroups[0];
-      axis = this.makeAxis(startX, startY, endX, startY, xa, {direction: 'x', len: 5, count: barGroups[0], space: xa.space, offset: xa.offset});
+      axis = this.makeAxis(startX, startY, endX, startY, xa, {direction: 'x', len: 5, count: dLen, space: xa.space, offset: xa.offset});
       canvas.path(axis[0], axis[1], 'x-axis');
     }
     // Y Axis
