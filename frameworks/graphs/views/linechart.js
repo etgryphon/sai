@@ -2,8 +2,9 @@
 // A basic Line chart
 // 
 /*globals Sai */
+sc_require('views/axischart');
 
-Sai.LineChartView = Sai.CanvasView.extend({
+Sai.LineChartView = Sai.AxisChartView.extend({
   
   // ..........................................................
   // Properties
@@ -79,7 +80,7 @@ Sai.LineChartView = Sai.CanvasView.extend({
       xa.coordScale = (endX - startX) / (xa.max - xa.min);
       tCount = ~~((xa.max - xa.min) / xa.step);
       space = (endX - startX)/tCount;
-      axis = this._makeAxis(startX, startY, endX, startY, xa, {direction: 'x', len: 5, count: tCount+1, space: space});
+      axis = this.makeAxis(startX, startY, endX, startY, xa, {direction: 'x', len: 5, count: tCount+1, space: space});
       canvas.path(axis[0], axis[1], 'x-axis');
     }
     // Y Axis
@@ -89,33 +90,33 @@ Sai.LineChartView = Sai.CanvasView.extend({
       ya.coordScale = (startY - endY) / (ya.max - ya.min);
       tCount = ~~((ya.max - ya.min) / ya.step);
       space = (startY - endY)/tCount;
-      axis = this._makeAxis(startX, startY, startX, endY, ya, {direction: 'y', len: 5, count: tCount+1, space: space});
+      axis = this.makeAxis(startX, startY, startX, endY, ya, {direction: 'y', len: 5, count: tCount+1, space: space});
       canvas.path(axis[0], axis[1], 'y-axis');
     }
     
     return [xa, ya];
   },
   
-  _makeAxis: function(sx, sy, ex, ey, axisAttrs, ticks){
-    var path, i, len, dir, tLen, space, tp, tickFunc;
-    axisAttrs = axisAttrs || {};
-    // Draw the line to the end
-    path = 'M%@,%@L%@,%@'.fmt(sx, sy, ex, ey);
-    if (ticks){
-      dir = ticks.direction;
-      tLen = ticks.len;
-      space = ticks.space;
-      tickFunc = dir === 'x' ? function(x,y){ return [x, (y+tLen), (x-space), y]; } : function(x, y){ return [(x-tLen), y, x, (y+space)]; };
-      for(i = 0, len = ticks.count; i < len; i++){
-        tp = tickFunc(ex,ey);
-        ex = tp[2];
-        ey = tp[3];
-        path += 'L%@,%@M%@,%@'.fmt(tp[0], tp[1], tp[2], tp[3]);
-      }
-    }
-    console.log('Axis Path: '+path);
-    return [path, {stroke: axisAttrs.color || 'black', strokeWidth: axisAttrs.weight || 1}];
-  },
+  // _makeAxis: function(sx, sy, ex, ey, axisAttrs, ticks){
+  //   var path, i, len, dir, tLen, space, tp, tickFunc;
+  //   axisAttrs = axisAttrs || {};
+  //   // Draw the line to the end
+  //   path = 'M%@,%@L%@,%@'.fmt(sx, sy, ex, ey);
+  //   if (ticks){
+  //     dir = ticks.direction;
+  //     tLen = ticks.len;
+  //     space = ticks.space;
+  //     tickFunc = dir === 'x' ? function(x,y){ return [x, (y+tLen), (x-space), y]; } : function(x, y){ return [(x-tLen), y, x, (y+space)]; };
+  //     for(i = 0, len = ticks.count; i < len; i++){
+  //       tp = tickFunc(ex,ey);
+  //       ex = tp[2];
+  //       ey = tp[3];
+  //       path += 'L%@,%@M%@,%@'.fmt(tp[0], tp[1], tp[2], tp[3]);
+  //     }
+  //   }
+  //   console.log('Axis Path: '+path);
+  //   return [path, {stroke: axisAttrs.color || 'black', strokeWidth: axisAttrs.weight || 1}];
+  // },
     
   mouseDown: function(evt) {
     console.log(evt.target);

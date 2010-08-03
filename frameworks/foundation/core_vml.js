@@ -44,6 +44,8 @@ Sai.mixin({
       elem = this.vml_format_attr(elem, attrs, value);
     }
     else if (SC.typeOf(attrs) === SC.T_HASH){
+      attrs.stroke = attrs.stroke || 'none';
+      attrs.fill = attrs.fill || 'none';
       for(key in attrs){
         elem = this.vml_format_attr(elem, key, attrs[key]);
       }
@@ -60,17 +62,18 @@ Sai.mixin({
       elem = elem.attr('strokeweight', '%@'.fmt(val)); 
     }
     else if (attr === 'fill'){
-      nVal = Sai.toRGB(val);
+      nVal = Sai.toRGB(val).hex;
+      elem = elem.attr('fillcolor', nVal); 
       // In the case where it is a gradient and not a color value
-      if (nVal.error){
-        nVal = this._gradientFill(elem, val);
-      }
-      else {
-        elem = elem.attr('fillcolor', nVal); 
-      }
+      // if (nVal.error){
+      //   nVal = this._gradientFill(elem, val);
+      // }
+      // else {
+      //   elem = elem.attr('fillcolor', nVal); 
+      // }
     }
     else if (attr === 'stroke'){
-      nVal = Sai.toRGB(val);
+      nVal = Sai.toRGB(val).hex;
       elem = elem.attr('strokecolor', nVal); 
     }
     else {

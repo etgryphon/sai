@@ -3,6 +3,8 @@ sc_require('system/shape');
 
 Sai.Rectangle = Sai.Shape.extend({
   
+  isRectangle: YES,
+  
   x: 0,
   y: 0,
   width: 0,
