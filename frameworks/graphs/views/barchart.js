@@ -48,7 +48,7 @@ Sai.BarChartView = Sai.AxisChartView.extend({
     // TODO: [EG] Regular Side by Side bar graph
     var x, xBase, bWidth = dAttrs.barWidth || 16, xSpace = xaxis.space,
         xOffset = (xSpace*xaxis.offset), y, 
-        bHeight, bSpace = dAttrs.barSpacing || 0,
+        bHeight, bSpacing = dAttrs.barSpacing || 0,
         colors = dAttrs.color || dAttrs.colors || 'blue';
     
     xBase = xaxis.coordMin;
@@ -56,8 +56,12 @@ Sai.BarChartView = Sai.AxisChartView.extend({
       xBase += xSpace;
       x = xBase - xOffset;
       if (SC.typeOf(series) === SC.T_ARRAY){
+        x -= (xaxis.count*bWidth) - ((xaxis.count-1)*bSpacing);
         series.forEach( function(bar, j){
-          // TODO: [EG] code to position the bars in groups
+          bHeight = yaxis.coordScale*bar;
+          y = yaxis.coordMin-bHeight;
+          canvas.rectangle(~~x, ~~y, bWidth, ~~bHeight, 0, {stroke: colors[j], fill: colors[j]}, 'bar-%@-%@'.fmt(i,j));
+          x += bWidth+bSpacing;
         });
       }
       else {
@@ -98,7 +102,7 @@ Sai.BarChartView = Sai.AxisChartView.extend({
     }
     // Y Axis
     if (ya){
-      ya.coordMin = startY;
+      ya.coordMin = startY-(xa.weight || 1);
       ya.coordMax = endY;
       ya.coordScale = (startY - endY) / barGroups[1];
       tCount = ~~(barGroups[1] / ya.step);
