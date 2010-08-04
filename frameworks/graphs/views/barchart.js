@@ -28,19 +28,21 @@ Sai.BarChartView = Sai.AxisChartView.extend({
   // @param xaxis: {color: 'black', labels: ['Morning', 'Afternoon', 'Evening']}
   xaxis: null,
   
+  displayProperties: 'data dataAttrs grid yaxis xaxis'.w(),
+  
   renderCanvas: function(canvas, firstTime) {
+    console.log('BarChartView: renderCanvas Called: '+firstTime);
     var grid = this.get('grid'),
-        d = this.get('data'),
+        d = this.get('data') || [],
         dAttrs = this.get('dataAttrs') || {stacked: NO, colors: 'black'},
         f = this.get('frame'), axis;
-    if (firstTime) {
-      axis = this._makeAxi(f, canvas, d, dAttrs.stacked) || [];
-      if (dAttrs.stacked){
-        this._processDataAsStackedBarGraph(f, canvas, d, dAttrs, axis[0], axis[1]);
-      }
-      else {
-        this._processDataAsRegularBarGraph(f, canvas, d, dAttrs, axis[0], axis[1]);
-      }
+    if (!firstTime) canvas.clear();  
+    axis = this._makeAxi(f, canvas, d, dAttrs.stacked) || [];
+    if (dAttrs.stacked){
+      this._processDataAsStackedBarGraph(f, canvas, d, dAttrs, axis[0], axis[1]);
+    }
+    else {
+      this._processDataAsRegularBarGraph(f, canvas, d, dAttrs, axis[0], axis[1]);
     }
   },
   

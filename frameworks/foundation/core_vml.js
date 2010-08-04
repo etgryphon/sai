@@ -7,6 +7,11 @@ sc_require('core_paths');
 /*globals Sai */
 Sai.mixin({
   
+  vml_clear: function(canvas){
+    var id = canvas.id(), w = canvas.width, h = canvas.height;
+    return this.vml_canvas_create(id, w, h);
+  },
+  
   vml_begin_node: null,
   vml_end_node: function(elem){ return elem.end(); },
   
@@ -15,8 +20,10 @@ Sai.mixin({
     
     canvas = SC.RenderContext('div').id(id).styles({position: 'absolute', top: '0px', left: '0px', width: sfmt.fmt(width), height: sfmt.fmt(height)});
     canvas.isRenderable = YES;
+    canvas.width = width;
+    canvas.height = height;
     canvas.abWidth = width;
-    canvas.abHeight = width;
+    canvas.abHeight = height;
     try {
       if (!doc.namespaces.rvml){ doc.namespaces.add("rvml", "urn:schemas-microsoft-com:vml"); }
       Sai.vml_begin_node = function(context, tagName) {

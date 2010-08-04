@@ -7,6 +7,15 @@ sc_require('core_paths');
 /*globals Sai */
 Sai.mixin({
   
+  svg_clear: function(canvas){
+    var fc = canvas ? canvas.firstChild : 0;
+    while (fc) {
+      canvas.removeChild(fc);
+      fc = canvas.firstChild || 0;
+    }
+    return canvas;
+  },
+  
   svg_canvas_create: function(id, width, height){
     var canvas;
     canvas = document.createElementNS(this.svgns, 'svg');
@@ -164,7 +173,7 @@ Sai.mixin({
     circle.setAttributeNS(null, 'r', radius);
     // set the applied attrs
     circle = Sai.svg_attr_set(canvas, circle, attrs);
-    canvas.appendChild(circle);
+
     return circle;
   },
   
@@ -186,7 +195,6 @@ Sai.mixin({
     ellipse.setAttributeNS(null, 'rx', rx);
     ellipse.setAttributeNS(null, 'ry', ry);
     ellipse = Sai.svg_attr_set(canvas, ellipse, attrs);
-    canvas.appendChild(ellipse);
     
     return ellipse;
   },
@@ -210,7 +218,6 @@ Sai.mixin({
     rect.setAttributeNS(null, 'height', h);
     rect.setAttributeNS(null, 'width', w);
     rect = Sai.svg_attr_set(canvas, rect, attrs);
-    canvas.appendChild(rect);
     
     return rect;
   },
@@ -238,7 +245,6 @@ Sai.mixin({
     textElem = Sai.svg_attr_set(canvas, textElem, attrs);
     // TODO: [EG] add appending of multiline text here...
     textElem.appendChild(tn);
-    canvas.appendChild(textElem);
     
     return textElem;
   },
@@ -267,7 +273,6 @@ Sai.mixin({
     poly = document.createElementNS(this.svgns, 'polygon');
     poly.setAttributeNS(null, 'points', polyPoints);
     poly = Sai.svg_attr_set(canvas, poly, attrs);
-    canvas.appendChild(poly); 
 
     return poly;
   },
@@ -288,7 +293,6 @@ Sai.mixin({
     pathStr = Sai.roundPath(Sai.pathToAbsolute(pathStr));
     pathElem.setAttributeNS(null, 'd', pathStr);
     pathElem = Sai.svg_attr_set(canvas, pathElem, attrs);
-    canvas.appendChild(pathElem);
     
     return pathElem;
   },
@@ -309,7 +313,6 @@ Sai.mixin({
     img.setAttributeNS(null, 'width', w);
     img.setAttributeNS(this.xlink, "href", src);
     img = Sai.svg_attr_set(canvas, img, attrs);
-    canvas.appendChild(img);
     
     return img;
   }

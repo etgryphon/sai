@@ -35,10 +35,8 @@ Sai.Text = Sai.Element.extend({
         h = this.get('height'),
         w = this.get('width'),
         attrs = this.basicAttrs();
-
-    if (firstTime) {
-      elem = Sai.canvas_create('text', canvas, x, y, h, w, text, attrs);
-      this._element = elem;
-    }
+        
+    elem = Sai.canvas_create('text', canvas, x, y, h, w, text, attrs);
+    this._element = elem;
   }
 });

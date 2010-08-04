@@ -20,10 +20,8 @@ Sai.Rectangle = Sai.Shape.extend({
         cr = this.get('radius') || 0,
         attrs = this.basicAttrs();
         
-    if (firstTime) {
-      rect = Sai.canvas_create('rect', canvas, x, y, h, w, cr, attrs);
-      this._element = rect;
-    }
+    rect = Sai.canvas_create('rect', canvas, x, y, h, w, cr, attrs);
+    this._element = rect;
   }
   
   

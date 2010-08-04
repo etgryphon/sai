@@ -28,6 +28,8 @@ Sai.LineChartView = Sai.AxisChartView.extend({
   // @param xaxis: {min: 10, max: 100, step: 10, weight: 1, color: 'blue'}
   xaxis: null,
   
+  displayProperties: 'data dataAttrs grid yaxis xaxis'.w(),
+  
   renderCanvas: function(canvas, firstTime) {
     var grid = this.get('grid'),
         f = this.get('frame'), axis;

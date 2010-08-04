@@ -15,10 +15,8 @@ Sai.Circle = Sai.Shape.extend({
         r = this.get('radius'),
         attrs = this.basicAttrs();
         
-    if (firstTime) {
-      circle = Sai.canvas_create('circle', canvas, x, y, r, attrs);
-      this._element = circle;
-    }
+    circle = Sai.canvas_create('circle', canvas, x, y, r, attrs);
+    this._element = circle;
   }
   
 });

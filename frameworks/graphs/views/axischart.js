@@ -6,10 +6,10 @@
 Sai.AxisChartView = Sai.CanvasView.extend({
 
   makeAxis: function(sx, sy, ex, ey, axisAttrs, ticks){
-    var path, i, len, dir, tLen, space, tp, tickFunc;
+    var path, i, len, dir, tLen, space, tp, tickFunc, rounder = this.rounder;
     axisAttrs = axisAttrs || {};
     // Draw the line to the end
-    path = 'M%@,%@L%@,%@'.fmt(sx, sy, ex, ey);
+    path = 'M%@,%@L%@,%@'.fmt(rounder(sx), rounder(sy), rounder(ex), rounder(ey));
     if (ticks){
       dir = ticks.direction;
       tLen = ticks.len;
@@ -22,7 +22,7 @@ Sai.AxisChartView = Sai.CanvasView.extend({
         tp = tickFunc(ex,ey,space*ticks.offset);
         ex = tp[2];
         ey = tp[3];
-        path += 'M%@,%@'.fmt(ex, ey);
+        path += 'M%@,%@'.fmt(rounder(ex), rounder(ey));
       }
       
       // Draw all the ticks
@@ -30,15 +30,20 @@ Sai.AxisChartView = Sai.CanvasView.extend({
         tp = tickFunc(ex,ey,space);
         ex = tp[2];
         ey = tp[3];
-        path += 'L%@,%@M%@,%@'.fmt(tp[0], tp[1], tp[2], tp[3]);
+        path += 'L%@,%@M%@,%@'.fmt(rounder(tp[0]), rounder(tp[1]), rounder(tp[2]), rounder(tp[3]));
       }
     }
-    console.log('Axis Path: '+path);
+    //console.log('Axis Path: '+path);
     return [path, {stroke: axisAttrs.color || 'black', strokeWidth: axisAttrs.weight || 1}];
   },
   
   makeGrid: function(){
     // TODO: [EG] make the grid
+  },
+  
+  rounder: function(x){
+    if (x > (~~x+0.00051)) return x.toFixed(3);
+    return x.toFixed(0);
   }
   
 });

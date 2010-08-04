@@ -52,5 +52,14 @@ Sai = SC.Object.create({
     for(i = 1; len > 1 && i < len; i++){ nArgs.push(arguments[i]); }
     fName = '%@_%@_create'.fmt(t.toLowerCase(), type);
     return Sai[fName].apply(Sai, nArgs);
+  },
+  
+  // ..........................................................
+  // General proxy function for creating Drawing Elements
+  // 
+  canvas_clear: function(canvas){
+    var t = Sai.vectorType, fName;
+    fName = '%@_clear'.fmt(t.toLowerCase());
+    return Sai[fName].call(Sai, canvas);
   }
 });

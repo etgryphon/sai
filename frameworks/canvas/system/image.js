@@ -26,9 +26,7 @@ Sai.Image = Sai.Element.extend({
         src = this.get('image'),
         attrs = this.basicAttrs();
 
-    if (firstTime) {
-      elem = Sai.canvas_create('image', canvas, x, y, h, w, src, attrs);
-      this._element = elem;
-    }
+    elem = Sai.canvas_create('image', canvas, x, y, h, w, src, attrs);
+    this._element = elem;
   }
 });

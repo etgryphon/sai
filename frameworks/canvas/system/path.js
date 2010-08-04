@@ -10,9 +10,7 @@ Sai.Path = Sai.Shape.extend({
         path = this.get('path'),
         attrs = this.basicAttrs();
         
-    if (firstTime) {
-      elem = Sai.canvas_create('path', canvas, path, attrs);
-      this._element = elem;
-    }
+    elem = Sai.canvas_create('path', canvas, path, attrs);
+    this._element = elem;
   }
 });

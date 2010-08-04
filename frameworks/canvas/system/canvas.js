@@ -13,29 +13,40 @@ Sai.Canvas = SC.Object.extend({
     if (firstTime) {
       canvas = Sai.canvas_create('canvas', cId, frame.width, frame.height);
       this._canvas = canvas;
-    
-      for (var i = 0; i < len; i++) {
-        oe[i].render(this, firstTime);
-      }
-    
-      this.renderToView(view);
     }
+    else {
+      Sai.canvas_clear(this._canvas || {});
+    }
+    
+    // make the individual shapes on the canvas
+    for (var i = 0; i < len; i++) {
+      oe[i].render(this, firstTime);
+    }
+  
+    this.renderToView(view);
   }, 
   
   getElementByTarget: function(target) { },
   
-  appendChild: function(element) {
-    if (SC.none(this._canvas.isRenderable)){
-      this._canvas.appendChild(element);
-    }
+  clear: function(){
+    var oes = this._orderedElements || [],
+        len = oes ? oes.length : 0;
+    this._canvas = Sai.canvas_clear(this._canvas || {});
+    oes.forEach( function(el){
+      this.removeElement(el, oes);
+    }, this);
+    this._orderedElements = null;
+    this._elements = null;
   },
   
   renderToView: function(view){
     var elems, c = this._canvas, layer = view.get('layer');
     // For SVG, because can't do innerHTML
     if (SC.none(c.isRenderable)){
-      // TODO: [EG] need to trigger the clear of the old elements 
-      // for the new elements
+      elems = this._orderedElements || [];
+      elems.forEach( function(el){
+        c.appendChild(el._element);
+      });
       layer.appendChild(c);
     }
     // For VML, super speed increase with innerHTML replacement
@@ -102,18 +113,16 @@ Sai.Canvas = SC.Object.extend({
   //   return ellipse;
   // },
   
-  removeElement: function(element) {
-    // if (!element) return;
-    // 
-    // var del = this.get('canvasDelegate');
-    // del.canvasRemoveElement(element);
-    // 
-    // this.orderedElements.removeObject(element);
-    // delete this.elements[element.get('id')];
+  removeElement: function(element, oes) {
+    if (!element) return;
+    var oe = oes || this._orderedElements;
+    if (oe) oe.removeObject(element);
+    delete this._elements[element.get('id')];
+    element.destroy();
   },
   
   getElementById: function(id) {
-    return this.elements[id];
+    return this._elements[id];
   },
   
   getElementByIndex: function(idx) {

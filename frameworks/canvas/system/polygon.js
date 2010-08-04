@@ -10,10 +10,8 @@ Sai.Polygon = Sai.Shape.extend({
         p = this.get('points'),
         attrs = this.basicAttrs();
         
-    if (firstTime) {
-      poly = Sai.canvas_create('polygon', canvas, p, attrs);
-      this._element = poly;
-    }
+    poly = Sai.canvas_create('polygon', canvas, p, attrs);
+    this._element = poly;
   }
   
   
