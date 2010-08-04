@@ -35,6 +35,10 @@ Sai.AxisChartView = Sai.CanvasView.extend({
     }
     console.log('Axis Path: '+path);
     return [path, {stroke: axisAttrs.color || 'black', strokeWidth: axisAttrs.weight || 1}];
+  },
+  
+  makeGrid: function(){
+    // TODO: [EG] make the grid
   }
   
 });

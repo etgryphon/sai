@@ -45,7 +45,6 @@ Sai.BarChartView = Sai.AxisChartView.extend({
   },
   
   _processDataAsRegularBarGraph: function(f, canvas, d, dAttrs, xaxis, yaxis){
-    // TODO: [EG] Regular Side by Side bar graph
     var x, xBase, bWidth = dAttrs.barWidth || 16, xSpace = xaxis.space,
         xOffset = (xSpace*xaxis.offset), y, 
         bHeight, bSpacing = dAttrs.barSpacing || 0,
@@ -75,6 +74,30 @@ Sai.BarChartView = Sai.AxisChartView.extend({
   
   _processDataAsStackedBarGraph: function(f, canvas, d, dAttrs, xaxis, yaxis){
     // TODO: [EG] Stacked bar graph
+    var x, xBase, bWidth = dAttrs.barWidth || 16, xSpace = xaxis.space,
+        xOffset = (xSpace*xaxis.offset), y, 
+        bHeight, bSpacing = dAttrs.barSpacing || 0,
+        colors = dAttrs.color || dAttrs.colors || 'blue';
+    
+    xBase = xaxis.coordMin;
+    d.forEach( function(series, i){
+      xBase += xSpace;
+      x = xBase - xOffset;
+      x -= (bWidth/2); 
+      if (SC.typeOf(series) === SC.T_ARRAY){
+        y = yaxis.coordMin;
+        series.forEach( function(bar, j){
+          bHeight = yaxis.coordScale*bar;
+          y = y-bHeight;
+          canvas.rectangle(~~x, ~~y, bWidth, ~~bHeight, 0, {stroke: colors[j], fill: colors[j]}, 'bar-%@-%@'.fmt(i,j));
+        });
+      }
+      else {
+        bHeight = yaxis.coordScale*series;
+        y = yaxis.coordMin-bHeight;
+        canvas.rectangle(~~x, ~~y, bWidth, ~~bHeight, 0, {stroke: colors, fill: colors}, 'bar-%@'.fmt(i));
+      }
+    });
   },
   
   _makeAxi: function(f, canvas, d, isStacked){
@@ -119,7 +142,18 @@ Sai.BarChartView = Sai.AxisChartView.extend({
         tmpMax = 0, tmpLen = 0; 
     d = d || [];
     if(isStacked){
-      // TODO: [EG] find out the groups and height for bar graph data...
+      ret[0] = 1;
+      if (SC.typeOf(d[0]) === SC.T_ARRAY){
+        // Find the Max Value and total group number
+        d.forEach( function(data){
+          tmpMax = 0;
+          data.forEach( function(x){ tmpMax += x; });
+          ret[1] = ret[1] < tmpMax ? tmpMax : ret[1];
+        });
+      }
+      else {
+        ret[1] = mmax.apply(0, d) || 0;
+      }
     }
     else {
       if (SC.typeOf(d[0]) === SC.T_ARRAY){
