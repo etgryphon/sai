@@ -1,29 +1,27 @@
 /*globals Sai */
 sc_require('system/element');
 
-Sai.Text = Sai.Element.extend({
+Sai.Text = Sai.Shape.extend({
   
   x: 0,
   y: 0,
   height: 0,
   width: 0,
-  textAnchor: null,
-  font: null,
-  stroke: 'none',
-  strokeWidth: null,
-  fill: '#000',
   text: 'Sai.Text',
   
+  // Text Attributes
+  // ex: {textAnchor: 'left, font: 'Helvetica', fontSize: '12'}
+  attrs: null,
+  
   basicAttrs: function(attrs){
+    var tAttrs = this.get('attrs') || {};
     attrs = attrs || {};
     
     // add the basic attrs
-    attrs.fill = this.get('fill');
-    attrs.stroke = this.get('stroke');
-    attrs['stroke-width'] = this.get('strokeWidth') || 1;
-    attrs['text-anchor'] = this.get('textAnchor') || 'left';
-    attrs['font-size'] = this.get('font') || '12';
-    attrs.font = this.get('font') || 'Helvetica, Ariel';
+    attrs = sc_super();
+    attrs['text-anchor'] = tAttrs.textAnchor || 'left';
+    attrs['font-size'] = tAttrs.fontSize || '12';
+    attrs.font = tAttrs.font || 'Helvetica, Ariel';
     
     return attrs;
   },

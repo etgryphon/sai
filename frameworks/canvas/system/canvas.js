@@ -105,6 +105,25 @@ Sai.Canvas = SC.Object.extend({
     this._addCanvasElement(elem, id);
     return elem;
   },
+  
+  text: function(x, y, width, height, text, attrs, id){
+    var elem;
+    x = x || {};
+    
+    elem = x.isText ? x : Sai.Text.create({
+      x: x,
+      y: y,
+      width: width,
+      height: height,
+      text: text,
+      fill: attrs.fill || 'black',
+      stroke: attrs.stroke || 'none',
+      attrs: attrs
+    });
+    
+    this._addCanvasElement(elem, id);
+    return elem;
+  },
   // 
   // ellipse: function(x, y, radiusX, radiusY, id) {
   //   var del = this.delegateFor('canvasDelegate');

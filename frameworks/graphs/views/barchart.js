@@ -122,8 +122,7 @@ Sai.BarChartView = Sai.AxisChartView.extend({
       xa.space =  ~~(tmp / dLen);
       xa.offset = 0.5;
       xa.count = barGroups[0];
-      axis = this.makeAxis(startX, startY, endX, startY, xa, {direction: 'x', len: 5, count: dLen, space: xa.space, offset: xa.offset});
-      canvas.path(axis[0], axis[1], 'x-axis');
+      this.makeAxis(canvas, startX, startY, endX, startY, xa, {direction: 'x', len: 5, count: dLen, space: xa.space, offset: xa.offset});
     }
     // Y Axis
     if (ya){
@@ -132,8 +131,7 @@ Sai.BarChartView = Sai.AxisChartView.extend({
       ya.coordScale = (startY - endY) / barGroups[1];
       tCount = ~~(barGroups[1] / ya.step);
       space = (startY - endY)/tCount;
-      axis = this.makeAxis(startX, startY, startX, endY, ya, {direction: 'y', len: 5, count: tCount, space: space});
-      canvas.path(axis[0], axis[1], 'y-axis');
+      this.makeAxis(canvas, startX, startY, startX, endY, ya, {direction: 'y', len: 5, count: tCount+1, space: space});
     }
     
     return [xa, ya];
