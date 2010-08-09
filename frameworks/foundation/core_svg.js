@@ -51,7 +51,7 @@ Sai.mixin({
   },
   
   svg_format_attr: function(elem, attr, val){
-    var nVal = val;
+    var nVal = val, nAttr = attr, lookup;
     attr = attr ? attr.toLowerCase() : null;
     
     if (attr === 'stroke-width'){
@@ -68,7 +68,16 @@ Sai.mixin({
     else if (attr === 'stroke'){
       nVal = Sai.toRGB(val).hex;
     }
-    elem.setAttributeNS(null, attr, nVal);
+    else if (attr === 'rotate'){
+      nAttr = 'transform';
+      nVal = 'rotate(%@ %@ %@)'.fmt(val.rotation, val.x, val.y);
+    }
+    // Text Only Params
+    else if (attr === 'text-anchor'){
+      lookup = {left: 'start', center: 'middle', right: 'end'};
+      nVal = lookup[val] || 'start';
+    }
+    elem.setAttributeNS(null, nAttr, nVal);
     return nVal;
   },
   
@@ -181,13 +190,13 @@ Sai.mixin({
   // Ellipse API
   // 
   svg_ellipse_create: function (canvas, x, y, rx, ry, attrs){
-    var ellipse;
+    var ellipse, round = Math.round;
     
     // normalize basic params
-    x = Sai.round(x);
-    y = Sai.round(y);
-    rx = Sai.round(rx);
-    ry = Sai.round(ry);
+    x = round(x);
+    y = round(y);
+    rx = round(rx);
+    ry = round(ry);
     
     ellipse = document.createElementNS(this.svgns, 'ellipse');
     ellipse.setAttributeNS(null, 'cx', x);
@@ -203,7 +212,7 @@ Sai.mixin({
   // Rectangle API
   // 
   svg_rect_create: function (canvas, x, y, h, w, cr, attrs){
-    var rect, round = Sai.round;
+    var rect, round = Math.round;
 
     // normalize basic params
     x = round(x);
@@ -226,27 +235,38 @@ Sai.mixin({
   // Text API
   // 
   svg_text_create: function (canvas, x, y, h, w, text, attrs){
-    var textElem, tn;
-    
+    var aPt, textElem, tn, round = Math.round;
+    attrs = attrs || {};
     // normalize basic params
-    x = Sai.round(x);
-    y = Sai.round(y);
-    h = Sai.round(h);
-    w = Sai.round(w);
-    
+    x = round(x) || 0;
+    y = round(y) || 0;
+    h = round(h) || 0;
+    w = round(w) || 0;
+    aPt = this._anchor_helper(x, y, h, w, attrs['text-anchor']);
+        
     textElem = document.createElementNS(this.svgns, 'text');
     // TODO: [EG] add creation of multiline text here...
     tn = document.createTextNode(text);
     
-    textElem.setAttributeNS(null, 'x', x);
-    textElem.setAttributeNS(null, 'y', y);
-    textElem.setAttributeNS(null, 'height', h);
-    textElem.setAttributeNS(null, 'width', w);
+    textElem.setAttributeNS(null, 'x', aPt[0]);
+    textElem.setAttributeNS(null, 'y', aPt[1]);
     textElem = Sai.svg_attr_set(canvas, textElem, attrs);
     // TODO: [EG] add appending of multiline text here...
     textElem.appendChild(tn);
     
     return textElem;
+  },
+  
+  _anchor_helper: function(x, y, h, w, anchor){
+    if (anchor === 'center'){
+      return [x+(w/2), y+h];
+    } 
+    else if (anchor === 'right'){
+      return [x+w, y+h];
+    }
+    else {
+      return [x, y+h];
+    }
   },
   
   svg_polygon_create: function (canvas, points, attrs){
@@ -298,13 +318,13 @@ Sai.mixin({
   },
   
   svg_image_create: function(canvas, x, y, h, w, src, attrs){
-    var img;
+    var img, round = Math.round;
 
     // normalize basic params
-    x = Sai.round(x);
-    y = Sai.round(y);
-    h = Sai.round(h);
-    w = Sai.round(w);
+    x = round(x);
+    y = round(y);
+    h = round(h);
+    w = round(w);
     
     img = document.createElementNS(this.svgns, 'image');
     img.setAttributeNS(null, 'x', x);
