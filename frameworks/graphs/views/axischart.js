@@ -7,7 +7,7 @@ Sai.AxisChartView = Sai.CanvasView.extend({
 
   makeAxis: function(canvas, sx, sy, ex, ey, axisAttrs, ticks){
     var path, i, len, dir, tLen, tickPts = {}, currTick,
-        space, tp, tickFunc, rounder = this.rounder, step;
+        space, tp, tOff, tickFunc, rounder = this.rounder, step;
     
     axisAttrs = axisAttrs || {};
     step = axisAttrs.step || 1;
@@ -17,12 +17,14 @@ Sai.AxisChartView = Sai.CanvasView.extend({
       dir = ticks.direction;
       tLen = ticks.len;
       space = ticks.space;
-      // Find the right tick intremental function based off of the axis (X or Y)
-      tickFunc = dir === 'x' ? function(x,y,space){ return [x, (y+tLen), (x+space), y]; } : function(x, y){ return [(x-tLen), y, x, (y-space)]; };
       
-      // Some times you want to skip the last tick on the axis
-      if (ticks.offset < 1){
-        tp = tickFunc(sx,sy,space*ticks.offset);
+      // Find the right tick intremental function based off of the axis (X or Y)
+      tickFunc = dir === 'x' ? function(x,y,sp){ return [x, (y+tLen), (x+sp), y]; } : function(x,y,sp){ return [(x-tLen), y, x, (y-sp)]; };
+      
+      // Some times you want to ofset the start of the ticks to center
+      tOff = ticks.offset || 0;
+      if (tOff > 0 && tOff < 1){
+        tp = tickFunc(sx,sy,space*tOff);
         sx = tp[2];
         sy = tp[3];
         path += 'M%@,%@'.fmt(rounder(sx), rounder(sy));
@@ -48,7 +50,7 @@ Sai.AxisChartView = Sai.CanvasView.extend({
   
   makeLabels: function(canvas, tickPts, axisAttrs, ticks){
     var dir, labels, l, lAttrs, tick, aa, t, labelPosFunc,
-        lWidth, lHeight;
+        lWidth, lHeight, lOff;
     
     aa = axisAttrs || {};
     dir = ticks ? ticks.direction || 'x' : 'x';
@@ -56,13 +58,15 @@ Sai.AxisChartView = Sai.CanvasView.extend({
     lAttrs = aa.labelAttrs || {};
     lWidth = lAttrs.width || ticks.space*0.9 || 50;
     lHeight = lAttrs.height || 15;
+    // TODO: [EG] HATE THIS...need to find out how to calulate the middle point of a text
+    lOff = lAttrs.offset || 0;
     
     // Create the label positioning function
     if (dir === 'x'){
       labelPosFunc = function(t, label){ 
         var x, y;
         x = +t.x - (lWidth/2);
-        y = +t.y;
+        y = +t.y + lOff;
         canvas.text(x, y, lWidth, lHeight, label, {fill: aa.labelColor || aa.color || 'black', textAnchor: 'center', fontSize: lAttrs.fontSize}, 'label-%@'.fmt(label));
         // canvas.rectangle(x, y, lWidth, lHeight, 0, {fill: aa.labelColor || aa.color || 'black', textAnchor: 'center', fontSize: lAttrs.fontSize}, 'label-%@'.fmt(label));
       };
@@ -71,9 +75,9 @@ Sai.AxisChartView = Sai.CanvasView.extend({
       labelPosFunc = function(t, label){ 
         var x, y;
         x = t.x - lWidth;
-        y = t.y;
-        canvas.text(x, y, lWidth, lHeight, label, {fill: aa.labelColor || aa.color || 'black', textAnchor: 'center', fontSize: lAttrs.fontSize}, 'label-%@'.fmt(label));
-        // canvas.rectangle(x, y, lWidth, lHeight, 0, {fill: aa.labelColor || aa.color || 'black', textAnchor: 'center', fontSize: lAttrs.fontSize}, 'label-%@'.fmt(label));
+        y = t.y - (lHeight/2) + lOff;
+        canvas.text(x, y, lWidth, lHeight, label, {fill: aa.labelColor || aa.color || 'black', textAnchor: 'right', fontSize: lAttrs.fontSize}, 'label-%@'.fmt(label));
+        // canvas.rectangle(x, y, lWidth, lHeight, 0, {fill: aa.labelColor || aa.color || 'black', textAnchor: 'right', fontSize: lAttrs.fontSize}, 'label-%@'.fmt(label));
       };
     }
       

@@ -16,7 +16,7 @@ Sai.BarChartView = Sai.AxisChartView.extend({
   data: null,
   
   // @param: dataAttrs - Hash of styling parameters
-  // @example: {stacked: true, colors: ['red' , 'blue', 'green']}
+  // @example: {stacked: true, horizontal: true, colors: ['red' , 'blue', 'green']}
   dataAttrs: null,
   
   // @param grid: show a grid for all the points
@@ -32,32 +32,37 @@ Sai.BarChartView = Sai.AxisChartView.extend({
   
   renderCanvas: function(canvas, firstTime) {
     console.log('BarChartView: renderCanvas Called: '+firstTime);
-    var grid = this.get('grid'),
+    var grid = this.get('grid'), barFunc,
         d = this.get('data') || [],
-        dAttrs = this.get('dataAttrs') || {stacked: NO, colors: 'black'},
+        dAttrs = this.get('dataAttrs') || {stacked: NO, horizontal: NO, colors: 'black'},
         f = this.get('frame'), axis;
+    if(d.length === 0) return;
+    
     if (!firstTime) canvas.clear();  
-    axis = this._makeAxi(f, canvas, d, dAttrs.stacked) || [];
+    axis = this._makeAxi(f, canvas, d, dAttrs.stacked, dAttrs.horizontal) || [];
     if (dAttrs.stacked){
-      this._processDataAsStackedBarGraph(f, canvas, d, dAttrs, axis[0], axis[1]);
+      barFunc = dAttrs.horizontal ? this._processDataAsHStackedBarGraph : this._processDataAsVStackedBarGraph;
+      barFunc(f, canvas, d, dAttrs, axis[0], axis[1]);
     }
     else {
-      this._processDataAsRegularBarGraph(f, canvas, d, dAttrs, axis[0], axis[1]);
+      barFunc = dAttrs.horizontal ? this._processDataAsHRegularBarGraph : this._processDataAsVRegularBarGraph;
+      barFunc(f, canvas, d, dAttrs, axis[0], axis[1]);
     }
   },
   
-  _processDataAsRegularBarGraph: function(f, canvas, d, dAttrs, xaxis, yaxis){
+  _processDataAsVRegularBarGraph: function(f, canvas, d, dAttrs, xaxis, yaxis){
     var x, xBase, bWidth = dAttrs.barWidth || 16, xSpace = xaxis.space,
         xOffset = (xSpace*xaxis.offset), y, 
         bHeight, bSpacing = dAttrs.barSpacing || 0,
-        colors = dAttrs.color || dAttrs.colors || 'blue';
+        colors = dAttrs.color || dAttrs.colors || 'blue',
+        gmn = xaxis.maxGroupNum;
     
     xBase = xaxis.coordMin;
     d.forEach( function(series, i){
       xBase += xSpace;
       x = xBase - xOffset;
       if (SC.typeOf(series) === SC.T_ARRAY){
-        x -= ((xaxis.count*bWidth) + ((xaxis.count-1)*bSpacing))/2;
+        x -= ((gmn*bWidth) + ((gmn-1)*bSpacing))/2;
         series.forEach( function(bar, j){
           bHeight = yaxis.coordScale*bar;
           y = yaxis.coordMin-bHeight;
@@ -74,7 +79,34 @@ Sai.BarChartView = Sai.AxisChartView.extend({
     });
   },
   
-  _processDataAsStackedBarGraph: function(f, canvas, d, dAttrs, xaxis, yaxis){
+  _processDataAsHRegularBarGraph: function(f, canvas, d, dAttrs, xaxis, yaxis){
+    var y, yBase, bHeight = dAttrs.barWidth || 16, ySpace = yaxis.space,
+        yOffset = (ySpace*yaxis.offset), x, 
+        bWidth, bSpacing = dAttrs.barSpacing || 0,
+        colors = dAttrs.color || dAttrs.colors || 'blue',
+        gmn = yaxis.maxGroupNum, gmnStart = ((gmn*bHeight) + ((gmn-1)*bSpacing))/2;
+    yBase = yaxis.coordMin;
+    x = xaxis.coordMin;
+    d.forEach( function(series, i){
+      yBase -= ySpace;
+      y = yBase + yOffset;
+      if (SC.typeOf(series) === SC.T_ARRAY){
+        y -= gmnStart;
+        series.forEach( function(bar, j){
+          bWidth = xaxis.coordScale*bar;
+          canvas.rectangle(x, ~~y, bWidth, bHeight, 0, {stroke: colors[j], fill: colors[j]}, 'bar-%@-%@'.fmt(i,j));
+          y += bHeight+bSpacing;
+        });
+      }
+      else {
+        y -= (bHeight/2); 
+        bWidth = xaxis.coordScale*series;
+        canvas.rectangle(x, ~~y, ~~bWidth, bHeight, 0, {stroke: colors, fill: colors}, 'bar-%@'.fmt(i));
+      }
+    });
+  },
+  
+  _processDataAsVStackedBarGraph: function(f, canvas, d, dAttrs, xaxis, yaxis){
     // TODO: [EG] Stacked bar graph
     var x, xBase, bWidth = dAttrs.barWidth || 16, xSpace = xaxis.space,
         xOffset = (xSpace*xaxis.offset), y, 
@@ -102,15 +134,46 @@ Sai.BarChartView = Sai.AxisChartView.extend({
     });
   },
   
-  _makeAxi: function(f, canvas, d, isStacked){
-    var axis, path, buffer = 0.1, tCount, space, barGroups, tmp,
+  _processDataAsHStackedBarGraph: function(f, canvas, d, dAttrs, xaxis, yaxis){
+    // TODO: [EG] Stacked bar graph
+    var y, yBase, bHeight = dAttrs.barWidth || 16, ySpace = yaxis.space,
+        yOffset = (ySpace*yaxis.offset), x, 
+        bWidth, bSpacing = dAttrs.barSpacing || 0,
+        colors = dAttrs.color || dAttrs.colors || 'blue';
+    
+    yBase = yaxis.coordMin;
+    d.forEach( function(series, i){
+      yBase -= ySpace;
+      y = yBase + yOffset;
+      y -= (bHeight/2); 
+      if (SC.typeOf(series) === SC.T_ARRAY){
+        x = xaxis.coordMin;
+        series.forEach( function(bar, j){
+          bWidth = xaxis.coordScale*bar;
+          canvas.rectangle(~~x, ~~y, ~~bWidth, bHeight, 0, {stroke: colors[j], fill: colors[j]}, 'bar-%@-%@'.fmt(i,j));
+          x += bWidth;
+        });
+      }
+      else {
+        bHeight = xaxis.coordScale*series;
+        x = xaxis.coordMin-bHeight;
+        canvas.rectangle(~~x, ~~y, bWidth, ~~bHeight, 0, {stroke: colors, fill: colors}, 'bar-%@'.fmt(i));
+      }
+    });
+  },
+  
+  _makeAxi: function(f, canvas, d, isStacked, isHorizontal){
+    var axis, path, tCount, space, offset, barGroups, tmp, aa,
         xa = this.get('xaxis') || {},
-        startX = f.width*buffer,
-        endX = f.width*(1.0 - buffer),
-        // Y coordinate stuff
         ya = this.get('yaxis') || {}, yScale,
-        startY = f.height*(1.0 - buffer),
-        endY = f.height*buffer, dLen = d.length || 0;
+        xBuffer = xa.buffer || 0.1,
+        yBuffer = ya.buffer || 0.1,
+        startX = f.width*yBuffer,
+        endX = f.width*0.95,
+        // Y coordinate stuff
+        startY = f.height*(1.0 - xBuffer),
+        endY = f.height*0.05, dLen = d.length || 0;
+        
     
     barGroups = this._calculateBarGroups(d, isStacked);
     // X Axis
@@ -118,41 +181,64 @@ Sai.BarChartView = Sai.AxisChartView.extend({
       // Calculate the coordinate system
       xa.coordMin = startX;
       xa.coordMax = endX;
-      tmp = (endX - startX);
-      xa.space =  ~~(tmp / dLen);
-      xa.offset = 0.5;
-      xa.count = barGroups[0];
-      this.makeAxis(canvas, startX, startY, endX, startY, xa, {direction: 'x', len: 5, count: dLen, space: xa.space, offset: xa.offset});
+      aa = isHorizontal ? this._calcForLabelAlignment(xa, startX, endX, barGroups.maxHeight) : this._calcForBarAlignment(dLen, xa, startX, endX, barGroups.maxGroupNum);
+      xa = aa[0]; tCount = aa[1];
+      if (SC.none(xa.hidden) || !xa.hidden) this.makeAxis(canvas, startX, startY, endX, startY, xa, {direction: 'x', len: 5, count: tCount, space: xa.space, offset: xa.offset});
     }
     // Y Axis
     if (ya){
-      ya.coordMin = startY-(xa.weight || 1);
+      ya.coordMin = startY;
       ya.coordMax = endY;
-      ya.coordScale = (startY - endY) / barGroups[1];
-      tCount = ~~(barGroups[1] / ya.step);
-      space = (startY - endY)/tCount;
-      this.makeAxis(canvas, startX, startY, startX, endY, ya, {direction: 'y', len: 5, count: tCount+1, space: space});
+      aa = isHorizontal ? this._calcForBarAlignment(dLen, ya, endY, startY, barGroups.maxGroupNum) : this._calcForLabelAlignment(ya, endY, startY, barGroups.maxHeight);
+      ya = aa[0]; tCount = aa[1];
+      if (SC.none(ya.hidden) || !ya.hidden) this.makeAxis(canvas, startX, startY, startX, endY, ya, {direction: 'y', len: 5, count: tCount, space: ya.space, offset: ya.offset});
     }
     
     return [xa, ya];
   },
   
+  _calcForBarAlignment: function(len, axis, start, end, maxGroupNum){
+    var tCount, tmp = (end - start);
+    axis = axis || {};
+  
+    axis.space =  ~~(tmp / len);
+    axis.offset = 0.5;
+    axis.maxGroupNum = maxGroupNum;
+    tCount = len;
+    
+    return [axis, tCount];
+  },
+  
+  _calcForLabelAlignment: function(axis, start, end, maxHeight){
+    var tCount;
+    axis = axis || {};
+    
+    axis.coordScale = (end - start) / maxHeight;
+    tCount = ~~(maxHeight / axis.step);
+    axis.space = (end - start)/tCount;
+    tCount += 1; // add the last tick to the line
+    axis.offset = 0;
+    
+    // Return modified Axis and tick count
+    return [axis, tCount];
+  },
+  
   _calculateBarGroups: function(d, isStacked){
-    var ret = [0, 0, d], mmax = Math.max,
+    var ret = {maxGroupNum: 0, maxHeight: 0}, mmax = Math.max,
         tmpMax = 0, tmpLen = 0; 
     d = d || [];
     if(isStacked){
-      ret[0] = 1;
+      ret.maxGroupNum = 1;
       if (SC.typeOf(d[0]) === SC.T_ARRAY){
         // Find the Max Value and total group number
         d.forEach( function(data){
           tmpMax = 0;
           data.forEach( function(x){ tmpMax += x; });
-          ret[1] = ret[1] < tmpMax ? tmpMax : ret[1];
+          ret.maxHeight = ret.maxHeight < tmpMax ? tmpMax : ret.maxHeight;
         });
       }
       else {
-        ret[1] = mmax.apply(0, d) || 0;
+        ret.maxHeight = mmax.apply(0, d) || 0;
       }
     }
     else {
@@ -160,17 +246,17 @@ Sai.BarChartView = Sai.AxisChartView.extend({
         // Find the Max Value and total group number
         d.forEach( function(data){
           tmpLen = data.length || 0;
-          ret[0] = ret[0] < tmpLen ? tmpLen : ret[0];
+          ret.maxGroupNum = ret.maxGroupNum < tmpLen ? tmpLen : ret.maxGroupNum;
           tmpMax = mmax.apply(0, data);
-          ret[1] = ret[1] < tmpMax ? tmpMax : ret[1];
+          ret.maxHeight = ret.maxHeight < tmpMax ? tmpMax : ret.maxHeight;
         });
       }
       else {
-        ret[0] = d.length || 0;
-        ret[1] = mmax.apply(0, d) || 0;
+        ret.maxGroupNum = d.length || 0;
+        ret.maxHeight = mmax.apply(0, d) || 0;
       }
     }
-    // Return: [total groups, max height, morphed data]
+
     return ret;
   },
     
