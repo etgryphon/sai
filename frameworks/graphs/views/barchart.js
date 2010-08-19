@@ -210,11 +210,23 @@ Sai.BarChartView = Sai.AxisChartView.extend({
   },
   
   _calcForLabelAlignment: function(axis, start, end, maxHeight){
-    var tCount;
+    var tCount, hasStepIncrement, hasStepCount;
     axis = axis || {};
-    
+    hasStepIncrement = !SC.none(axis.step);
+    hasStepCount = !SC.none(axis.steps);
+
     axis.coordScale = (end - start) / maxHeight;
-    tCount = ~~(maxHeight / axis.step);
+    
+    if(!hasStepIncrement && !hasStepCount){ // make and educated guess with 25 tick marks
+      tCount = 25;
+      axis.step = ~~(maxHeight/tCount);
+    } else if(hasStepCount){ // use a total count of X
+      tCount = axis.steps;
+      axis.step = ~~(maxHeight/tCount);
+    } else { // Use step increments of X
+      tCount = ~~(maxHeight / axis.step);
+    }
+    
     axis.space = (end - start)/tCount;
     tCount += 1; // add the last tick to the line
     axis.offset = 0;
@@ -258,10 +270,5 @@ Sai.BarChartView = Sai.AxisChartView.extend({
     }
 
     return ret;
-  },
-    
-  mouseDown: function(evt) {
-    console.log(evt.target);
   }
-  
 });
