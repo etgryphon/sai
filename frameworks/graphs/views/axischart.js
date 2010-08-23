@@ -6,11 +6,12 @@
 Sai.AxisChartView = Sai.CanvasView.extend({
 
   makeAxis: function(canvas, sx, sy, ex, ey, axisAttrs, ticks){
-    var path, i, len, dir, tLen, tickPts = {}, currTick,
+    var path, i, len, dir, tLen, tickPts = {}, currTick, tickLabels = [],
         space, tp, tOff, tickFunc, rounder = this.rounder, step;
     
     axisAttrs = axisAttrs || {};
     step = axisAttrs.step || 1;
+    console.log("Step Size: "+step);
     // Draw the line to the end
     path = 'M%@1,%@2L%@3,%@4M%@1,%@2'.fmt(rounder(sx), rounder(sy), rounder(ex), rounder(ey));
     if (ticks){
@@ -37,19 +38,20 @@ Sai.AxisChartView = Sai.CanvasView.extend({
         sy = tp[3];
         currTick = {x: rounder(tp[0]), y: rounder(tp[1])};
         path += 'L%@,%@M%@,%@'.fmt(currTick.x, currTick.y, rounder(tp[2]), rounder(tp[3]));
-        tickPts[i*step] = currTick;
+        tickPts[i] = {t: currTick, idx: i*step};
+        tickLabels.push(''+i*step);
       }
     }
     //console.log('Axis Path: '+path);
     
     // Do Labels
-    if (!SC.none(axisAttrs.labels)) this.makeLabels(canvas, tickPts, axisAttrs, ticks);
+    if (!SC.none(axisAttrs.labels)) this.makeLabels(canvas, tickPts, axisAttrs, ticks, tickLabels);
     
     canvas.path(path, {stroke: axisAttrs.color || 'black', strokeWidth: axisAttrs.weight || 1}, '%@-axis'.fmt(dir));
   },
   
-  makeLabels: function(canvas, tickPts, axisAttrs, ticks){
-    var dir, labels, l, lAttrs, tick, aa, t, labelPosFunc,
+  makeLabels: function(canvas, tickPts, axisAttrs, ticks, tLabels){
+    var dir, labels, l, lAttrs, tick, aa, t, labelPosFunc, col,
         lWidth, lHeight, lOff;
     
     aa = axisAttrs || {};
@@ -60,6 +62,7 @@ Sai.AxisChartView = Sai.CanvasView.extend({
     lHeight = lAttrs.height || 15;
     // TODO: [EG] HATE THIS...need to find out how to calulate the middle point of a text
     lOff = lAttrs.offset || 0;
+    col = aa.labelColor || aa.color || 'black';
     
     // Create the label positioning function
     if (dir === 'x'){
@@ -67,7 +70,7 @@ Sai.AxisChartView = Sai.CanvasView.extend({
         var x, y;
         x = +t.x - (lWidth/2);
         y = +t.y + lOff;
-        canvas.text(x, y, lWidth, lHeight, label, {fill: aa.labelColor || aa.color || 'black', textAnchor: 'center', fontSize: lAttrs.fontSize}, 'label-%@'.fmt(label));
+        canvas.text(x, y, lWidth, lHeight, label, {fill: col, stroke: col, textAnchor: 'center', fontSize: lAttrs.fontSize}, 'label-%@'.fmt(label));
         // canvas.rectangle(x, y, lWidth, lHeight, 0, {fill: aa.labelColor || aa.color || 'black', textAnchor: 'center', fontSize: lAttrs.fontSize}, 'label-%@'.fmt(label));
       };
     }
@@ -76,20 +79,29 @@ Sai.AxisChartView = Sai.CanvasView.extend({
         var x, y;
         x = t.x - lWidth;
         y = t.y - (lHeight/2) + lOff;
-        canvas.text(x, y, lWidth, lHeight, label, {fill: aa.labelColor || aa.color || 'black', textAnchor: 'right', fontSize: lAttrs.fontSize}, 'label-%@'.fmt(label));
+        canvas.text(x, y, lWidth, lHeight, label, {fill: col, stroke: col, textAnchor: 'right', fontSize: lAttrs.fontSize}, 'label-%@'.fmt(label));
         // canvas.rectangle(x, y, lWidth, lHeight, 0, {fill: aa.labelColor || aa.color || 'black', textAnchor: 'right', fontSize: lAttrs.fontSize}, 'label-%@'.fmt(label));
       };
     }
-      
+    
     if (SC.typeOf(labels) === SC.T_HASH){ 
-      // TODO: [EG] make file line points
+      this._generateIncrementalLabels(tickPts, labels, labelPosFunc, YES);
     }
     else if (SC.typeOf(labels) === SC.T_ARRAY){
-      for (t in tickPts){
-        tick = tickPts[t];
-        l = labels[t];
-        if (!SC.none(tick) && l) labelPosFunc(tick, l);
-      }
+      this._generateIncrementalLabels(tickPts, labels, labelPosFunc, NO);
+    }
+    else if (SC.typeOf(labels) === SC.T_BOOL){
+      this._generateIncrementalLabels(tickPts, tLabels, labelPosFunc, NO);
+    }
+  },
+  
+  _generateIncrementalLabels: function(pts, labels, func, useIndex){
+    var tick, t, l, idx;
+    for (t in pts){
+      tick = pts[t].t;
+      idx = pts[t].idx;
+      l = useIndex ? labels[idx] : labels[t];
+      if (!SC.none(tick) && l) func(tick, l);
     }
   },
   
