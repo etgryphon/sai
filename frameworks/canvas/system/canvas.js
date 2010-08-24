@@ -51,7 +51,6 @@ Sai.Canvas = SC.Object.extend({
     }
     // For VML, super speed increase with innerHTML replacement
     else {
-      console.log('Render HTML:\n\n%@'.fmt(c.strings));
       elems = c.join(' ');
       layer.innerHTML = elems;
     }

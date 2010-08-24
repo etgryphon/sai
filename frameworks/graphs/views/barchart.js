@@ -31,13 +31,12 @@ Sai.BarChartView = Sai.AxisChartView.extend({
   displayProperties: 'data dataAttrs grid yaxis xaxis'.w(),
   
   renderCanvas: function(canvas, firstTime) {
-    console.log('BarChartView: renderCanvas Called: '+firstTime);
     var grid = this.get('grid'), barFunc,
         d = this.get('data') || [],
         dAttrs = this.get('dataAttrs') || {stacked: NO, horizontal: NO, colors: 'black'},
         f = this.get('frame'), axis;
     if(d.length === 0) return;
-    
+
     if (!firstTime) canvas.clear();  
     axis = this._makeAxi(f, canvas, d, dAttrs.stacked, dAttrs.horizontal) || [];
     if (dAttrs.stacked){

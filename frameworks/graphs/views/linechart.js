@@ -33,7 +33,6 @@ Sai.LineChartView = Sai.AxisChartView.extend({
   renderCanvas: function(canvas, firstTime) {
     var grid = this.get('grid'),
         f = this.get('frame'), axis;
-    
     if (!firstTime) canvas.clear();  
     
     axis = this._makeAxi(f, canvas);
