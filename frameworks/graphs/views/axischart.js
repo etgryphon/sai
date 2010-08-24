@@ -11,7 +11,6 @@ Sai.AxisChartView = Sai.CanvasView.extend({
     
     axisAttrs = axisAttrs || {};
     step = axisAttrs.step || 1;
-    console.log("Step Size: "+step);
     // Draw the line to the end
     path = 'M%@1,%@2L%@3,%@4M%@1,%@2'.fmt(rounder(sx), rounder(sy), rounder(ex), rounder(ey));
     if (ticks){
@@ -60,7 +59,7 @@ Sai.AxisChartView = Sai.CanvasView.extend({
     lAttrs = aa.labelAttrs || {};
     lWidth = lAttrs.width || ticks.space*0.9 || 50;
     lHeight = lAttrs.height || 15;
-    // TODO: [EG] HATE THIS...need to find out how to calulate the middle point of a text
+    // FIXME: [EG] HATE THIS...need to find out how to calulate the middle point of a text
     lOff = lAttrs.offset || 0;
     col = aa.labelColor || aa.color || 'black';
     
