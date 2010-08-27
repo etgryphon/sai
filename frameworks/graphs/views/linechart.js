@@ -123,3 +123,4 @@ Sai.LineChartView = Sai.AxisChartView.extend({
   }
   
 });
+

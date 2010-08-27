@@ -14,3 +14,4 @@ Sai.Path = Sai.Shape.extend({
     this._element = elem;
   }
 });
+

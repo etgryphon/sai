@@ -271,3 +271,4 @@ Sai.BarChartView = Sai.AxisChartView.extend({
     return ret;
   }
 });
+

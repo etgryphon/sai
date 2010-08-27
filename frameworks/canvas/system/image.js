@@ -30,3 +30,4 @@ Sai.Image = Sai.Element.extend({
     this._element = elem;
   }
 });
+

@@ -75,3 +75,4 @@ Sai.CanvasView = SC.View.extend({
     }
   }
 });
+

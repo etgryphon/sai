@@ -38,3 +38,4 @@ Sai.Text = Sai.Shape.extend({
     this._element = elem;
   }
 });
+
