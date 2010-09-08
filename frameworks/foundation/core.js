@@ -61,6 +61,18 @@ Sai = SC.Object.create({
     var t = Sai.vectorType, fName;
     fName = '%@_clear'.fmt(t.toLowerCase());
     return Sai[fName].call(Sai, canvas);
-  }
-});
+  },
 
+  colors: function() {
+    var colours = [];
+    var hues = [.6, .2, .05, .1333, .75, 0];
+    for (var i = 0; i < 10; i++) {
+      if (i < hues.length) {
+        colours.push("hsb(" + hues[i] + ", .75, .75)");
+      } else {
+        colours.push("hsb(" + hues[i - hues.length] + ", 1, .5)");
+      }
+    }
+    return colours ;
+  }.property().cacheable()
+});
