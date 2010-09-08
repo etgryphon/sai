@@ -6,7 +6,16 @@ Sai.Element = SC.Object.extend({
   
   render: function(canvas, firstTime) {},
   
-  basicAttrs: function(attrs){}
+  basicAttrs: function(attrs){},
+
+  getBBox: function() {
+    var f = this.get('frame') ;
+    return {
+      x: f.x + (this.bbx || 0),
+      y: f.y,
+      width: f.width,
+      height: f.height
+    };
+  }
   
 });
-

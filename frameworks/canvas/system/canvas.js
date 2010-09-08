@@ -51,6 +51,7 @@ Sai.Canvas = SC.Object.extend({
     }
     // For VML, super speed increase with innerHTML replacement
     else {
+      console.log('Render HTML:\n\n%@'.fmt(c.strings));
       elems = c.join(' ');
       layer.innerHTML = elems;
     }
@@ -75,6 +76,7 @@ Sai.Canvas = SC.Object.extend({
       strokeWidth: attrs.strokeWidth || 1,
       fill: attrs.fill || 'none'
     });
+    if (x.isCircle && !id) id = y ; // Allow to passin ID with premade object.
     
     this._addCanvasElement(circle, id);
     return circle;
