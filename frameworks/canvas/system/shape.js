@@ -5,15 +5,15 @@ Sai.Shape = Sai.Element.extend({
   
   fill: null,
   stroke: null,
-  strokeWidth: 1,
+  strokeWidth: null,
   
   basicAttrs: function(attrs){
     attrs = attrs || {};
     
     // add the basic attrs
-    attrs.fill = this.get('fill');
-    attrs.stroke = this.get('stroke');
-    attrs['stroke-width'] = this.get('strokeWidth');
+    attrs.fill = this.get('fill') || 'none';
+    attrs.stroke = this.get('stroke') || 'none';
+    attrs['stroke-width'] = this.get('strokeWidth') || 1;
     
     return attrs;
   }

@@ -70,7 +70,8 @@ Sai.mixin({
     }
     else if (attr === 'fill'){
       nVal = Sai.toRGB(val).hex;
-      elem = elem.attr('fillcolor', nVal); 
+      elem = Sai.vml_begin_node(elem, 'fill').attr({on: "True", color: nVal}).end();
+      // elem = elem.attr('fillcolor', nVal);
       // In the case where it is a gradient and not a color value
       // if (nVal.error){
       //   nVal = this._gradientFill(elem, val);
@@ -81,7 +82,8 @@ Sai.mixin({
     }
     else if (attr === 'stroke'){
       nVal = Sai.toRGB(val).hex;
-      elem = elem.attr('strokecolor', nVal); 
+      // elem = elem.attr('strokecolor', nVal); 
+      elem = Sai.vml_begin_node(elem, 'stroke').attr({on: "True", color: nVal}).end();
     }
     else {
       elem = elem.attr(attr, val); 
@@ -168,6 +170,7 @@ Sai.mixin({
     w = round(w);
     
     // Create the actual node
+    console.log('Fill: '+attrs.fill);
     elem = Sai.vml_begin_node(c, 'shape');
     attrs.coordorigin = '0 0';
     attrs.coordsize = '%@ %@'.fmt(zoom*cWidth, zoom*cHeight);
@@ -180,10 +183,11 @@ Sai.mixin({
     elem = Sai.vml_begin_node(elem, 'textpath');
     font = '%@px %@'.fmt(attrs['font-size'], attrs.font);
     anchor = textAnchorMap[attrs['text-anchor'] || 'left'];
-    elem = elem.styles({font: font, 'v-text-align': anchor}).attr({string: text, on: 'True'}).end();
+    elem = elem.styles({font: font}).attr({string: text, on: 'True'}).end();
     
     // End Text wrapper
     attrs = this._clearAttrs(attrs);
+    attrs.stroke = attrs.stroke || attrs.fill || 'black';
     elem = Sai.vml_attr_set(c, elem, attrs);
     elem = Sai.vml_end_node(elem);
     
