@@ -62,11 +62,19 @@ Sai.Canvas = SC.Object.extend({
     return elem;
   },
   
-  circle: function(x, y, radius, id) {
+  circle: function(x, y, radius, attrs, id) {
     var circle;
     x = x || {};
+    attrs = attrs || {};
     
-    circle = x.isCircle ? x : Sai.Circle.create({ x: x, y: y, radius: radius});
+    circle = x.isCircle ? x : Sai.Circle.create({ 
+      x: x, 
+      y: y, 
+      radius: radius,
+      stroke: attrs.stroke || 'black',
+      strokeWidth: attrs.strokeWidth || 1,
+      fill: attrs.fill || 'none'
+    });
     
     this._addCanvasElement(circle, id);
     return circle;
@@ -89,6 +97,7 @@ Sai.Canvas = SC.Object.extend({
   rectangle: function(x, y, width, height, radius, attrs, id) {
     var elem;
     x = x || {};
+    attrs = attrs || {};
     
     elem = x.isRectangle ? x : Sai.Rectangle.create({
       x: x,
@@ -108,6 +117,7 @@ Sai.Canvas = SC.Object.extend({
   text: function(x, y, width, height, text, attrs, id){
     var elem;
     x = x || {};
+    attrs = attrs || {};
     
     elem = x.isText ? x : Sai.Text.create({
       x: x,
@@ -123,13 +133,6 @@ Sai.Canvas = SC.Object.extend({
     this._addCanvasElement(elem, id);
     return elem;
   },
-  // 
-  // ellipse: function(x, y, radiusX, radiusY, id) {
-  //   var del = this.delegateFor('canvasDelegate');
-  //   var ellipse = del.canvasCreateEllipse(this, x, y, radiusX, radiusY);
-  //   this._addCanvasElement(ellipse, id);
-  //   return ellipse;
-  // },
   
   removeElement: function(element, oes) {
     if (!element) return;
