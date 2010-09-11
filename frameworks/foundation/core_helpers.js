@@ -78,6 +78,8 @@ Sai.mixin({
     if (saturation > 1) saturation /= 100;
     if (brightness > 1) brightness /= 100;
     
+    console.log("h: %@, s: %@, b: %@".fmt(hue, saturation, brightness));
+
     // Start the convertion process
     colorConvFunc = function(bs, colorHue){ 
       var color, temp = 2.0*brightness - bs;
@@ -110,7 +112,7 @@ Sai.mixin({
     }
     
     // Create the RGB object
-    // console.log("R: %@, G: %@, B: %@".fmt(red, green, blue));
+    console.log("R: %@, G: %@, B: %@".fmt(red, green, blue));
     rgb = {r: red, g: green, b: blue, toString: function(){ return this.hex;} };
     
     // Convert to Hex

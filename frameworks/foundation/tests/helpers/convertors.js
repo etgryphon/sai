@@ -83,6 +83,13 @@ test("Function: hsb2rgb(): Check General Case 4", function() {
   equals(Sai.hsb2rgb({h: 0.667, s: 0.75, b: 0.75}), '#8F8FEF', "With one param with normalization, general case of (h: 240, s: 75%, b: 75%)");
 });
 
+test("Function: hsb2rgb(): Check General Case 5", function() {
+  equals(Sai.hsb2rgb(180, 100, 100), '#00FFFF', "With all the params, general case of (h: 180, s: 100%, b: 100%)");
+  equals(Sai.hsb2rgb(0.5, 1, 1), '#00FFFF', "With all the params with normalization, general case of (h: 180, s: 100%, b: 100%)");
+  equals(Sai.hsb2rgb({h: 180, s: 100, b: 100}), '#00FFFF', "With one param, general case of (h: 180, s: 100%, b: 100%)");
+  equals(Sai.hsb2rgb({h: 0.5, s: 1, b: 1}), '#00FFFF', "With one param with normalization, general case of (h: 180, s: 100%, b: 100%)");
+});
+
 
 // ..........................................................
 // rgb2hsb() Function test
