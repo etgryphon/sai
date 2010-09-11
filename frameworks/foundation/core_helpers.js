@@ -60,7 +60,8 @@ Sai.mixin({
   // Chapter 17 describes color spaces and shows their relationships 
   // via easy-to-follow diagrams.
   hsb2rgb: function(hue, saturation, brightness){
-    hue = hue || {};
+    if (SC.none(hue)) hue = {};
+    //hue = hue || {};
     var propHash = !SC.none(hue.h) && !SC.none(hue.s) && !SC.none(hue.b),
         red, blue, green,
         temp1, temp2, temp3,
@@ -74,45 +75,104 @@ Sai.mixin({
         hue = hue.h*1;
     }
     // convert to 0-1 range if hue/satuaration/brightness in 0-255 range
-    if (hue > 1)  hue /= 359;
+    if (hue !== 0 && hue <= 1) hue *= 360;
     if (saturation > 1) saturation /= 100;
     if (brightness > 1) brightness /= 100;
-    
-    console.log("h: %@, s: %@, b: %@".fmt(hue, saturation, brightness));
 
-    // Start the convertion process
-    colorConvFunc = function(bs, colorHue){ 
-      var color, temp = 2.0*brightness - bs;
-      
-      if ((6.0*colorHue) < 1) { color = temp+(bs-temp)*6.0*colorHue; }
-      else if ((2.0*colorHue) < 1) { color = bs; }
-      else if ((3.0*colorHue) < 2) { color = temp+(bs-temp)*((2.0/3.0)-colorHue)*6.0; }
-      else { color = temp; }
-      
-      if (color < 0) color*=-1; 
-      return Math.round(color*255);
-    };
-    if (saturation === 0) { 
-      red = green = blue = Math.round(brightness*255);
-    } 
-    else if (brightness < 0.5){
-      temp2 = brightness*(1.0+saturation);
-      red = colorConvFunc(temp2, (hue+1.0/3.0));
-      green = colorConvFunc(temp2, hue);
-      blue = colorConvFunc(temp2, (hue-1.0/3.0));
-    }
-    else if (brightness >= 0.5){
-      temp2 = (brightness+saturation) - (brightness*saturation);
-      red = colorConvFunc(temp2, (hue+(1.0/3.0)));
-      green = colorConvFunc(temp2, hue);
-      blue = colorConvFunc(temp2, (hue-(1.0/3.0)));
+    // Start the conversion process
+    //
+    // Modified from: http://www.cs.rit.edu/~ncs/color/t_convert.html
+    //
+    var i, f, p, q, t;
+    if (saturation === 0){
+      // achromatic (grey)
+      r = brightness;
+      g = brightness;
+      b = brightness;
     }
     else {
-      red = green = blue = 0;
+      if (hue === 360) hue = 359.99;
+      if (hue !== 0) hue /= 60;      // sector 0 to 5
+      i = Math.floor(hue);
+      f = hue - i;      // factorial part of hue
+      p = brightness * ( 1 - saturation );
+      q = brightness * ( 1 - saturation * f );
+      t = brightness * ( 1 - saturation * ( 1 - f ) );
+      switch (i) {
+      case 0:
+        r = brightness;
+        g = t;
+        b = p;
+        break;
+      case 1:
+        r = q;
+        g = brightness;
+        b = p;
+        break;
+      case 2:
+        r = p;
+        g = brightness;
+        b = t;
+        break;
+      case 3:
+        r = p;
+        g = q;
+        b = brightness;
+        break;
+      case 4:
+        r = t;
+        g = p;
+        b = brightness;
+        break;
+      case 5:
+        r = brightness;
+        g = p;
+        b = q;
+        break;
+      default:
+        r = 0;
+        g = 0;
+        b = 0;
+        break;
+      }
     }
+//    colorConvFunc = function(bs, colorHue){ 
+//      var color, temp = 2.0*brightness - bs;
+//      
+//      if ((6.0*colorHue) < 1) { color = temp+(bs-temp)*6.0*colorHue; }
+//      else if ((2.0*colorHue) < 1) { color = bs; }
+//      else if ((3.0*colorHue) < 2) { color = temp+(bs-temp)*((2.0/3.0)-colorHue)*6.0; }
+//      else { color = temp; }
+//      
+//      if (color < 0) color*=-1; 
+//      return Math.round(color*255);
+//    };
+//    if (saturation === 0) { 
+//      red = green = blue = Math.round(brightness*255);
+//    } 
+//    else if (brightness < 0.5){
+//      temp2 = brightness*(1.0+saturation);
+//      red = colorConvFunc(temp2, (hue+1.0/3.0));
+//      green = colorConvFunc(temp2, hue);
+//      blue = colorConvFunc(temp2, (hue-1.0/3.0));
+//    }
+//    else if (brightness >= 0.5){
+//      temp2 = (brightness+saturation) - (brightness*saturation);
+//      red = colorConvFunc(temp2, (hue+(1.0/3.0)));
+//      green = colorConvFunc(temp2, hue);
+//      blue = colorConvFunc(temp2, (hue-(1.0/3.0)));
+//    }
+//    else {
+//      red = green = blue = 0;
+//    }
     
+    red = Math.round(r * 255);
+    green = Math.round(g * 255);
+    blue = Math.round(b * 255);
+
     // Create the RGB object
-    console.log("R: %@, G: %@, B: %@".fmt(red, green, blue));
+    //console.log("R: %@, G: %@, B: %@".fmt(red, green, blue));
+
     rgb = {r: red, g: green, b: blue, toString: function(){ return this.hex;} };
     
     // Convert to Hex
@@ -120,7 +180,7 @@ Sai.mixin({
     g = Sai.toTwoCharHex(green);
     b = Sai.toTwoCharHex(blue);
     rgb.hex = "#" + r + g + b;
-    
+
     return rgb;
   },
   
