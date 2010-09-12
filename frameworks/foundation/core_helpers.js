@@ -61,20 +61,20 @@ Sai.mixin({
   // via easy-to-follow diagrams.
   hsb2rgb: function(hue, saturation, brightness){
     if (SC.none(hue)) hue = {};
-    //hue = hue || {};
+
     var propHash = !SC.none(hue.h) && !SC.none(hue.s) && !SC.none(hue.b),
         red, blue, green,
-        temp1, temp2, temp3,
         r, g, b,
-        colorConvFunc, toHexConv,
-        //i, f, p, q, t, 
-        rgb, rg = /^(?=[\da-f]$)/;
+        rgb;
+
+    // Handle case of single param hue as a hash
     if (SC.typeOf(hue) === SC.T_HASH && propHash) {
         brightness = hue.b*1;
         saturation = hue.s*1;
         hue = hue.h*1;
     }
-    // convert to 0-1 range if hue/satuaration/brightness in 0-255 range
+
+    // Convert to 0-1 range if hue/satuaration/brightness in 0-255 range
     if (hue !== 0 && hue <= 1) hue *= 360;
     if (saturation > 1) saturation /= 100;
     if (brightness > 1) brightness /= 100;
@@ -82,6 +82,8 @@ Sai.mixin({
     // Start the conversion process
     //
     // Modified from: http://www.cs.rit.edu/~ncs/color/t_convert.html
+    //
+    // A good write-up on hsb: http://www.huevaluechroma.com/093.php
     //
     var i, f, p, q, t;
     if (saturation === 0){
@@ -136,43 +138,13 @@ Sai.mixin({
         break;
       }
     }
-//    colorConvFunc = function(bs, colorHue){ 
-//      var color, temp = 2.0*brightness - bs;
-//      
-//      if ((6.0*colorHue) < 1) { color = temp+(bs-temp)*6.0*colorHue; }
-//      else if ((2.0*colorHue) < 1) { color = bs; }
-//      else if ((3.0*colorHue) < 2) { color = temp+(bs-temp)*((2.0/3.0)-colorHue)*6.0; }
-//      else { color = temp; }
-//      
-//      if (color < 0) color*=-1; 
-//      return Math.round(color*255);
-//    };
-//    if (saturation === 0) { 
-//      red = green = blue = Math.round(brightness*255);
-//    } 
-//    else if (brightness < 0.5){
-//      temp2 = brightness*(1.0+saturation);
-//      red = colorConvFunc(temp2, (hue+1.0/3.0));
-//      green = colorConvFunc(temp2, hue);
-//      blue = colorConvFunc(temp2, (hue-1.0/3.0));
-//    }
-//    else if (brightness >= 0.5){
-//      temp2 = (brightness+saturation) - (brightness*saturation);
-//      red = colorConvFunc(temp2, (hue+(1.0/3.0)));
-//      green = colorConvFunc(temp2, hue);
-//      blue = colorConvFunc(temp2, (hue-(1.0/3.0)));
-//    }
-//    else {
-//      red = green = blue = 0;
-//    }
     
+    // Convert to 0-255 range
     red = Math.round(r * 255);
     green = Math.round(g * 255);
     blue = Math.round(b * 255);
 
     // Create the RGB object
-    //console.log("R: %@, G: %@, B: %@".fmt(red, green, blue));
-
     rgb = {r: red, g: green, b: blue, toString: function(){ return this.hex;} };
     
     // Convert to Hex
