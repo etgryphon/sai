@@ -152,7 +152,7 @@ test("Function: path2vml()", function() {
   // Test 1: Line
   pathStr = 'M10,10 L100,100';
   pPath = Sai.parsePathString(pathStr);
-  debugger;
+  // debugger;
   pVml = Sai.path2vml(pPath);
   same(pVml, "m10,10 l100,100 e", "Line: SVG(M10,10 L100,100) from pt (10,10) to (100,100)");
   

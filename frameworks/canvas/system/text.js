@@ -21,7 +21,7 @@ Sai.Text = Sai.Shape.extend({
     attrs = sc_super();
     attrs['text-anchor'] = tAttrs.textAnchor || 'left';
     attrs['font-size'] = tAttrs.fontSize || '12';
-    attrs.font = tAttrs.font || 'Helvetica, Ariel';
+    attrs.font = tAttrs.font || 'Helvetica, Arial';
     
     return attrs;
   },
