@@ -200,7 +200,7 @@ Sai.BarChartView = Sai.AxisChartView.extend({
     var tCount, tmp = (end - start);
     axis = axis || {};
   
-    axis.space =  ~~(tmp / len);
+    axis.space =  tmp / len;
     axis.offset = 0.5;
     axis.maxGroupNum = maxGroupNum;
     tCount = len;

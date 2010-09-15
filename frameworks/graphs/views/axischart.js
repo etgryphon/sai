@@ -14,6 +14,7 @@ Sai.AxisChartView = Sai.CanvasView.extend({
     // Draw the line to the end
     path = 'M%@1,%@2L%@3,%@4M%@1,%@2'.fmt(rounder(sx), rounder(sy), rounder(ex), rounder(ey));
     if (ticks){
+      // console.log('ticks: %@, space: %@, start: {x: %@, y: %@}, end: {x: %@, y: %@}'.fmt(ticks.count, ticks.space, sx, sy, ex, ey));
       dir = ticks.direction;
       tLen = ticks.len;
       space = ticks.space;
