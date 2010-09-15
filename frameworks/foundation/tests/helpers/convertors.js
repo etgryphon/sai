@@ -49,10 +49,10 @@ test("Function: hsb2rgb(): Check Zero Case", function() {
 });
 
 test("Function: hsb2rgb(): Check Max Case", function() {
-  equals(Sai.hsb2rgb(359, 100, 100), '#FF0004', "With all the params, checking that max hue, saturation, and brightness it white");
-  equals(Sai.hsb2rgb(1, 1, 1), '#FF0004', "With all the params with normalization, checking that max hue, saturation, and brightness it white");
-  equals(Sai.hsb2rgb({h: 359, s: 100, b: 100}), '#FF0004', "With one param, checking that max hue, saturation, and brightness it white");
-  equals(Sai.hsb2rgb({h: 1, s: 1, b: 1}), '#FF0004', "With one param with normalization, checking that max hue, saturation, and brightness it white");  
+  equals(Sai.hsb2rgb(360, 100, 100), '#FF0000', "With all the params, checking that max hue, saturation, and brightness it white");
+  equals(Sai.hsb2rgb(1, 1, 1), '#FF0000', "With all the params with normalization, checking that max hue, saturation, and brightness it white");
+  equals(Sai.hsb2rgb({h: 360, s: 100, b: 100}), '#FF0000', "With one param, checking that max hue, saturation, and brightness it white");
+  equals(Sai.hsb2rgb({h: 1, s: 1, b: 1}), '#FF0000', "With one param with normalization, checking that max hue, saturation, and brightness it white");  
 });
 
 test("Function: hsb2rgb(): Check General Case 1", function() {
