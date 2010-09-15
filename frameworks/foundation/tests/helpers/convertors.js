@@ -63,10 +63,10 @@ test("Function: hsb2rgb(): Check General Case 1", function() {
 });
 
 test("Function: hsb2rgb(): Check General Case 2", function() {
-  equals(Sai.hsb2rgb(60, 50, 50), '#808040', "With all the params, general case of (h: 60, s: 50%, b: 50%)");
-  equals(Sai.hsb2rgb(0.167, 0.5, 0.5), '#808040', "With all the params with normalization, general case of (h: 60, s: 50%, b: 50%)");
-  equals(Sai.hsb2rgb({h: 60, s: 50, b: 50}), '#808040', "With one param, general case of (h: 60, s: 50%, b: 50%)");
-  equals(Sai.hsb2rgb({h: 0.167, s: 0.5, b: 0.5}), '#808040', "With one param with normalization, general case of (h: 60, s: 50%, b: 50%)");
+  equals(Sai.hsb2rgb(60, 50, 50), '#7f8040', "With all the params, general case of (h: 60, s: 50%, b: 50%)");
+  equals(Sai.hsb2rgb(0.167, 0.5, 0.5), '#7f8040', "With all the params with normalization, general case of (h: 60, s: 50%, b: 50%)");
+  equals(Sai.hsb2rgb({h: 60, s: 50, b: 50}), '#7f8040', "With one param, general case of (h: 60, s: 50%, b: 50%)");
+  equals(Sai.hsb2rgb({h: 0.167, s: 0.5, b: 0.5}), '#7f8040', "With one param with normalization, general case of (h: 60, s: 50%, b: 50%)");
 });
 
 test("Function: hsb2rgb(): Check General Case 3", function() {
