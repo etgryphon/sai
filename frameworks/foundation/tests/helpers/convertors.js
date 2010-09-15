@@ -42,10 +42,10 @@ test("Function: toHex(): Funky Color Case", function() {
 // hsb2rgb() Function tests
 // 
 test("Function: hsb2rgb(): Check Zero Case", function() {
-  equals(Sai.hsb2rgb(0, 0, 33.3), '#545454', "With all the params, checking that zero saturation makes colors equal to brightness");
-  equals(Sai.hsb2rgb(0, 0, 0.333), '#545454', "With all the params with normalization, checking that zero saturation makes colors equal to brightness");
-  equals(Sai.hsb2rgb({h: 0, s: 0, b: 33.3}), '#545454', "With one param, checking that zero saturation makes colors equal to brightness");
-  equals(Sai.hsb2rgb({h: 0, s: 0, b: 0.333}), '#545454', "With one param with normalization, checking that zero saturation makes colors equal to brightness");
+  equals(Sai.hsb2rgb(0, 0, 33.3), '#555555', "With all the params, checking that zero saturation makes colors equal to brightness");
+  equals(Sai.hsb2rgb(0, 0, 0.333), '#555555', "With all the params with normalization, checking that zero saturation makes colors equal to brightness");
+  equals(Sai.hsb2rgb({h: 0, s: 0, b: 33.3}), '#555555', "With one param, checking that zero saturation makes colors equal to brightness");
+  equals(Sai.hsb2rgb({h: 0, s: 0, b: 0.333}), '#555555', "With one param with normalization, checking that zero saturation makes colors equal to brightness");
 });
 
 test("Function: hsb2rgb(): Check Max Case", function() {
@@ -63,10 +63,10 @@ test("Function: hsb2rgb(): Check General Case 1", function() {
 });
 
 test("Function: hsb2rgb(): Check General Case 2", function() {
-  equals(Sai.hsb2rgb(60, 50, 50), '#7f8040', "With all the params, general case of (h: 60, s: 50%, b: 50%)");
-  equals(Sai.hsb2rgb(0.167, 0.5, 0.5), '#7f8040', "With all the params with normalization, general case of (h: 60, s: 50%, b: 50%)");
-  equals(Sai.hsb2rgb({h: 60, s: 50, b: 50}), '#7f8040', "With one param, general case of (h: 60, s: 50%, b: 50%)");
-  equals(Sai.hsb2rgb({h: 0.167, s: 0.5, b: 0.5}), '#7f8040', "With one param with normalization, general case of (h: 60, s: 50%, b: 50%)");
+  equals(Sai.hsb2rgb(60, 50, 50), '#7F8040', "With all the params, general case of (h: 60, s: 50%, b: 50%)");
+  equals(Sai.hsb2rgb(0.167, 0.5, 0.5), '#7F8040', "With all the params with normalization, general case of (h: 60, s: 50%, b: 50%)");
+  equals(Sai.hsb2rgb({h: 60, s: 50, b: 50}), '#7F8040', "With one param, general case of (h: 60, s: 50%, b: 50%)");
+  equals(Sai.hsb2rgb({h: 0.167, s: 0.5, b: 0.5}), '#7F8040', "With one param with normalization, general case of (h: 60, s: 50%, b: 50%)");
 });
 
 test("Function: hsb2rgb(): Check General Case 3", function() {
