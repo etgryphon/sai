@@ -1,1 +1,31 @@
-Attempting to port the VML/SVG abstraction of Raphael for use in seedjs
+=== Welcome to the Sai  ===
+
+This is a Generic Vector Graphics Library that works on all the major browsers.  
+
+This has been heavily influenced by RaphaelJS, but written in a more SproutCore-friendly way.
+
+=== SUPPORTED BROWSERS ===
+
+FF3+
+Webkit 5+
+IE7+
+Chrome 6+
+
+Working on more...these are just the ones I have tested
+
+=== INSTALLATION ===
+
+In your frameworks directory, run:
+  git clone git://github.com/etgryphon/sai.git
+
+=== CONTRIBUTORS ===
+
+Main Architect: Evin Grano (@etgryphon)
+Contributors:
+  - Michael Cohen (@frozencanuck)
+  - Jeff Pittman (@geojeff)
+  - Geoffrey Donaldson (@geoffreyd)
+
+=== LICENSE ===
+
+Sai is under the MIT License please see: license.js

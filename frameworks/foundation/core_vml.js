@@ -170,7 +170,7 @@ Sai.mixin({
     w = round(w);
     
     // Create the actual node
-    console.log('Fill: '+attrs.fill);
+    // console.log('Fill: '+attrs.fill);
     elem = Sai.vml_begin_node(c, 'shape');
     attrs.coordorigin = '0 0';
     attrs.coordsize = '%@ %@'.fmt(zoom*cWidth, zoom*cHeight);
