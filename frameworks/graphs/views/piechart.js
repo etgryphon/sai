@@ -25,18 +25,15 @@ Sai.PieChartView = Sai.CanvasView.extend(
   //  labels: ['Early', 'Morning', 'Afternoon', 'Evening', 'Night']}
   legend: null,
 
+  // Re-Render if these change
   displayProperties: 'data dataAttrs grid yaxis xaxis'.w(),
 
   renderCanvas: function(canvas, firstTime) {
     var d = this.get('data') || [],
         dAttrs = this.get('dataAttrs') || {stacked: NO, horizontal: NO},
         f = this.get('frame'),
-        legend = this.get('legend'),
-        cx, cy, r, layout;
+        legend = this.get('legend');
     if (d.length === 0) return;
-
-    // Set Default starting points and radius
-    layout = this.get('layout') ;
 
     dAttrs.showValues = dAttrs.showValues || NO ;
     
@@ -49,17 +46,11 @@ Sai.PieChartView = Sai.CanvasView.extend(
 
   _processPieData: function(frame, canvas, values, atts, legend) {
     atts = atts || {};
-    l_pos   = "east" ;
-    if (legend && legend.pos) l_pos = legend.pos ;
-
     var r       = atts.radius || 100,
         l       = this.get('layout'),
         len     = values.length,
         series  = [],
         sectors = [],
-//        covers = [],
-        chart   = [],
-        order   = [],
         angle   = 0,
         total   = 0,
         others  = 0,
@@ -68,6 +59,8 @@ Sai.PieChartView = Sai.CanvasView.extend(
         colors  = Sai.get('colors'),
         showValues = atts.showValues,
         padding = atts.padding || 5,
+        l_pos   = (legend && legend.pos) ? legend.pos : "east",
+        // Calculate the positioning of the Chart.
         xy      = {
           "north": {
             x: ~~(l.width / 2),
@@ -86,6 +79,7 @@ Sai.PieChartView = Sai.CanvasView.extend(
             y: ~~(l.height / 2)
           }
         },
+        // Calculate the positioning of the legend.
         lxy     = {
           "north": {
             x: ~~(l.width / 2),
@@ -123,31 +117,46 @@ Sai.PieChartView = Sai.CanvasView.extend(
       var lineHeight = 18,
           y = ly - (len * lineHeight)/2,
           h = y + 10,
-          lh = h,
+          lh = h, w,
           label,
-          t, s, v, middle;
+          t, s, v, r, middle, value;
       labels = labels || [];
       dir = (dir && dir.toLowerCase && dir.toLowerCase()) || "east";
 
       for (var i = 0; i < len; i++) {
         label = labels[i] || values[i].value;
 
-        console.log("Making value %@ ShowValues: %@".fmt(i, showValues));
+        // If we've been asked to add the value hovering over the pie slices, do so.
         if (showValues) {
           middle = sectors[i].middle;
+          value = values[i].value.toString();
+          w = value.length * 7;
           v = Sai.Text.create({
-            x: middle.x - 5,
+            x: middle.x - (w/2),
             y: middle.y - 5,
-            width: 50,
+            width: value.length * 6,
             height: 10,
-            text: values[i].value,
+            text: value,
             fill: 'black', // text color
             attrs: {
               textAnchor: 'centre'
             }
           });
+          // Add a background shape to the value, so that you can read it.
+          r = Sai.Rectangle.create({
+            x: middle.x - (w+8)/2+2,
+            y: middle.y - 9,
+            height: 18,
+            width: w+8,
+            fill: 'lightgray',
+            stroke: 'gray',
+            strokeWidth: 1,
+            radius: 10
+          });
+          r = canvas.element(r, 'label-back-%@'.fmt(i));
           v = canvas.element(v,"label-text-%@".fmt(i));
         }
+        // now add the legend if told to do so.
         if (legend) {
           s = Sai.Rectangle.create({
             x: lx,
@@ -172,7 +181,24 @@ Sai.PieChartView = Sai.CanvasView.extend(
       }
 
     } ;
+    
+    function sector(cx, cy, r, startAngle, endAngle, fill) {
+      var rad = Math.PI / 180,
+        x1 = cx + r * Math.cos(-startAngle * rad),
+        x2 = cx + r * Math.cos(-endAngle * rad),
+        xm = cx + r / 2 * Math.cos(-(startAngle + (endAngle - startAngle) / 2) * rad),
+        y1 = cy + r * Math.sin(-startAngle * rad),
+        y2 = cy + r * Math.sin(-endAngle * rad),
+        ym = cy + r / 2 * Math.sin(-(startAngle + (endAngle - startAngle) / 2) * rad),
+        res = ["M", cx, cy, "L", x1, y1, "A", r, r, 0, +(Math.abs(endAngle - startAngle) > 180), 1, x2, y2, "z"];
+      res.middle = {x: xm, y: ym};
+      return res;
+    }
 
+    var returnThisValue = function() {
+      return this.value;
+    };
+    
     if (len == 1) {
       var c = Sai.Circle.create({
         x: cx,
@@ -180,33 +206,20 @@ Sai.PieChartView = Sai.CanvasView.extend(
         radius: r,
         fill: atts.colors && atts.colors[0] || colors[0],
         stroke: atts.stroke || "#fff",
-        strokeWidth: atts.strokewidth === null ? 1 : atts.strokewidth
-      }) ;
+        strokeWidth: atts.strokewidth ? atts.strokewidth : 1
+      }),
+          i;
       c = canvas.element(c, "circle-0") ;
       series.push(c) ;
-//      covers.push(Sai.Circle.create(SC.mixin(Sai.SHIM, {x:cx, y:cy, radius:r})));
       total = values[0];
-      values[0] = {value: values[0], order: 0, valueOf: function () { return this.value; }};
+      values[0] = {value: values[0], order: 0, valueOf: returnThisValue};
       series[0].middle = {x: cx, y: cy};
       series[0].mangle = 180;
     } else {
-      function sector(cx, cy, r, startAngle, endAngle, fill) {
-        var rad = Math.PI / 180,
-          x1 = cx + r * Math.cos(-startAngle * rad),
-          x2 = cx + r * Math.cos(-endAngle * rad),
-          xm = cx + r / 2 * Math.cos(-(startAngle + (endAngle - startAngle) / 2) * rad),
-          y1 = cy + r * Math.sin(-startAngle * rad),
-          y2 = cy + r * Math.sin(-endAngle * rad),
-          ym = cy + r / 2 * Math.sin(-(startAngle + (endAngle - startAngle) / 2) * rad),
-          res = ["M", cx, cy, "L", x1, y1, "A", r, r, 0, +(Math.abs(endAngle - startAngle) > 180), 1, x2, y2, "z"];
-        res.middle = {x: xm, y: ym};
-        return res;
-      }
-      for (var i = 0; i < len; i++) {
+      
+      for (i = 0; i < len; i++) {
         total += values[i];
-        values[i] = {value: values[i], order: i, valueOf: function () {
-          return this.value;
-        }};
+        values[i] = {value: values[i], order: i, valueOf: returnThisValue};
       }
 
       if (atts.sorted) {
@@ -215,8 +228,8 @@ Sai.PieChartView = Sai.CanvasView.extend(
         });
       }
 
-      for (var i = 0; i < len; i++) {
-        if (defcut && values[i] * 360 / total <= 1.5) {
+      for (i = 0; i < len; i++) {
+        if (defcut && (values[i] * 360 / total <= 1.5)) {
           cut = i;
           defcut = false;
         }
@@ -228,8 +241,11 @@ Sai.PieChartView = Sai.CanvasView.extend(
         }
       }
       len = Math.min(cut + 1, values.length);
-      others && values.splice(len) && (values[cut].others = true);
-      for (var i = 0; i < len; i++) {
+      if (others) {
+        values.splice(len);
+        values[cut].others = true;
+      }
+      for (i = 0; i < len; i++) {
         var mangle = angle - 360 * values[i] / total / 2;
         if (!i) {
           angle = 90 - mangle;
@@ -239,12 +255,11 @@ Sai.PieChartView = Sai.CanvasView.extend(
           var ipath = sector(cx, cy, 1, angle, angle - 360 * values[i] / total).join(",");
         }
         var path = sector(cx, cy, r, angle, angle -= 360 * values[i] / total);
-  //      var p = this.path(atts.init ? ipath : path).attr({fill: atts.colors && atts.colors[i] || "#666", stroke: atts.stroke || "#fff", "stroke-width": (atts.strokewidth == null ? 1 : atts.strokewidth), "stroke-linejoin": "round"});
         var p = Sai.Path.create({
           path: atts.init ? ipath : path,
           fill: color(i),
           stroke: atts.stroke || "#fff",
-          "stroke-width": (atts.strokewidth == null ? 1 : atts.strokewidth),
+          "stroke-width": (atts.strokewidth ? atts.strokewidth : 1),
           "stroke-linejoin": "round"
         });
         p.value = values[i];
@@ -253,20 +268,12 @@ Sai.PieChartView = Sai.CanvasView.extend(
         p = canvas.element(p, "arc-%@".fmt(i)) ;
         sectors.push(p);
         series.push(p);
-        atts.init && p.animate({path: path.join(",")}, (+atts.init - 1) || 1000, ">");
+        if (atts.init) p.animate({path: path.join(",")}, (+atts.init - 1) || 1000, ">");
       }
-//      for (var i = 0; i < len; i++) {
-//        var p = paper.path(sectors[i].attr("path")).attr(this.g.shim);
-//        atts.href && atts.href[i] && p.attr({href: atts.href[i]});
-//        p.attr = function () {
-//        };
-//        covers.push(p);
-//        series.push(p);
-//      }
     }
 
 
-    if (legend || showLabels) {
+    if (legend || showValues) {
         _legend(legend.labels, legend.others, legend.mark, legend.pos);
     }
 
