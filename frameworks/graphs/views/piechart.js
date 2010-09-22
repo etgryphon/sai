@@ -13,11 +13,11 @@ Sai.PieChartView = Sai.CanvasView.extend(
 
   // @param data: This is an array of pairs for the data points
   // @example: [1,2,3,4,5,6]
-  // Bar #1: "1, 2, 3, 4, 5, 6"
+  // Pie #1: "1, 2, 3, 4, 5, 6"
   data: null,
 
   // @param: dataAttrs - Hash of styling parameters
-  // @example: {stacked: true, horizontal: true, colors: ['red' , 'blue', 'green']}
+  // @example: dataAttrs: { colors: ['green', 'blue', '#F8A377'], radius: 100, padding: 20, values: {font: '9', pos: 'middle', color: 'black'}},
   dataAttrs: null,
 
   // @param legend: {color: 'black', buffer: 0.15, pos: 'right',
@@ -30,35 +30,24 @@ Sai.PieChartView = Sai.CanvasView.extend(
 
   renderCanvas: function(canvas, firstTime) {
     var d = this.get('data') || [],
-        dAttrs = this.get('dataAttrs') || {stacked: NO, horizontal: NO},
+        dAttrs = this.get('dataAttrs') || {},
         f = this.get('frame'),
-        legend = this.get('legend');
+        legend = this.get('legend'),
+        vals = dAttrs.values;
     if (d.length === 0) return;
-
-    dAttrs.showValues = dAttrs.showValues || NO ;
+    dAttrs.values = (SC.typeOf(vals) === SC.T_BOOL) ? {fontSize: '9', pos: 'middle', color: 'black', bColor: 'lightgray'} : (SC.typeOf(vals) === SC.T_HASH) ? vals : null;
     
-
     if (!firstTime) canvas.clear(); // Make sure we are stating from scratch
-
     this._processPieData(f, canvas, d, dAttrs, legend);
-
   },
 
   _processPieData: function(frame, canvas, values, atts, legend) {
     atts = atts || {};
-    var r       = atts.radius || 100,
-        l       = this.get('layout'),
-        len     = values.length,
-        series  = [],
-        sectors = [],
-        angle   = 0,
-        total   = 0,
-        others  = 0,
-        cut     = 9,
-        defcut  = true,
-        colors  = Sai.get('colors'),
-        showValues = atts.showValues,
-        padding = atts.padding || 5,
+    var r = atts.radius || 100, l = this.get('layout'),
+        len = values.length, series = [], sectors = [],
+        angle = 0, total = 0, others = 0, cut = 9,
+        defcut = true, colors  = Sai.get('colors'),
+        showValues = atts.values, padding = atts.padding || 5,
         l_pos   = (legend && legend.pos) ? legend.pos : "east",
         // Calculate the positioning of the Chart.
         xy      = {
@@ -90,14 +79,14 @@ Sai.PieChartView = Sai.CanvasView.extend(
             y: r + (padding)
           },
           "east": {
-            x: xy['east'].x * 2,
-            y: xy['east'].y,
-            w: l.width - padding - xy['east'].x * 2
+            x: xy.east.x * 2,
+            y: xy.east.y,
+            w: l.width - padding - xy.east.x * 2
           },
           "west": {
             x: padding,
-            y: xy['west'].y,
-            w: xy['west'].x - padding
+            y: xy.west.y,
+            w: xy.west.x - padding
           }
         },
         cx      = atts.x || xy[l_pos].x,
@@ -106,9 +95,7 @@ Sai.PieChartView = Sai.CanvasView.extend(
         ly      = legend.y || lxy[l_pos].y,
         lw      = legend.w || lxy[l_pos].w;
 
-
     // Calculate legend
-
     var color = function(idx) {
       return atts.colors && atts.colors[idx] || colors[idx] || "#666";
     };
@@ -117,9 +104,9 @@ Sai.PieChartView = Sai.CanvasView.extend(
       var lineHeight = 18,
           y = ly - (len * lineHeight)/2,
           h = y + 10,
-          lh = h, w,
-          label,
-          t, s, v, r, middle, value;
+          lh = h, w, stroke,
+          label, lWidth, lHeight, xl, yl,
+          t, s, v, r, middle, value, col;
       labels = labels || [];
       dir = (dir && dir.toLowerCase && dir.toLowerCase()) || "east";
 
@@ -131,30 +118,24 @@ Sai.PieChartView = Sai.CanvasView.extend(
           middle = sectors[i].middle;
           value = values[i].value.toString();
           w = value.length * 7;
-          v = Sai.Text.create({
-            x: middle.x - (w/2),
-            y: middle.y - 5,
-            width: value.length * 6,
-            height: 10,
-            text: value,
-            fill: 'black', // text color
-            attrs: {
-              textAnchor: 'centre'
-            }
-          });
-          // Add a background shape to the value, so that you can read it.
-          r = Sai.Rectangle.create({
-            x: middle.x - (w+8)/2+2,
-            y: middle.y - 9,
-            height: 18,
-            width: w+8,
-            fill: 'lightgray',
-            stroke: 'gray',
-            strokeWidth: 1,
-            radius: 10
-          });
-          r = canvas.element(r, 'label-back-%@'.fmt(i));
-          v = canvas.element(v,"label-text-%@".fmt(i));
+          
+          // FIXME: [EG GD] This is only temp until I add background color to text fields
+          col = showValues.bcolor || 'lightgray';
+          stroke = showValues.bStroke || 'gray';
+          xl = middle.x - (w+8)/2+2; // <= FIXME: [EG GD] Why is this like this
+          yl = middle.y - 9; // <= FIXME: [EG GD] Why is this like this
+          lWidth = 18; // <= FIXME: [EG GD] Why is this like this
+          lHeight = w+8;
+          canvas.rectangle(xl, yl, lWidth, lHeight, 0, {fill: col, stroke: stroke}, 'label-back-%@'.fmt(i));
+          
+          // Calculate all the postions of the text.
+          col = showValues.color || 'black';
+          stroke = showValues.stroke || col;
+          xl = middle.x - (w/2);
+          yl = middle.y - 5;
+          lWidth = value.length * 6;
+          lHeight = 10;
+          canvas.text(xl, yl, lWidth, lHeight, value, {fill: col, stroke: stroke, textAnchor: 'center', fontSize: showValues.fontSize, radius: 10}, 'label-text-%@'.fmt(i));
         }
         // now add the legend if told to do so.
         if (legend) {
@@ -199,7 +180,7 @@ Sai.PieChartView = Sai.CanvasView.extend(
       return this.value;
     };
     
-    if (len == 1) {
+    if (len === 1) {
       var c = Sai.Circle.create({
         x: cx,
         y: cy,
@@ -272,11 +253,8 @@ Sai.PieChartView = Sai.CanvasView.extend(
       }
     }
 
-
-    if (legend || showValues) {
-        _legend(legend.labels, legend.others, legend.mark, legend.pos);
-    }
-
+    // Last thing is to layer the legend or the labels on the pie chart
+    if (legend || showValues) _legend(legend.labels, legend.others, legend.mark, legend.pos);
   }
 
 });
