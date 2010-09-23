@@ -187,7 +187,7 @@ Sai.PieChartView = Sai.CanvasView.extend(
         radius: r,
         fill: atts.colors && atts.colors[0] || colors[0],
         stroke: atts.stroke || "#fff",
-        strokeWidth: atts.strokewidth ? atts.strokewidth : 1
+        strokeWidth: Sai.validStrokeWidth(atts.strokeWidth, 0)
       }),
           i;
       c = canvas.element(c, "circle-0") ;

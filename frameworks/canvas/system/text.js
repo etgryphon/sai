@@ -21,6 +21,7 @@ Sai.Text = Sai.Shape.extend({
     attrs = sc_super();
     attrs['text-anchor'] = tAttrs.textAnchor || 'left';
     attrs['font-size'] = tAttrs.fontSize || '12';
+    attrs['stroke-width'] = Sai.isZeroOrValue(this.get('strokeWidth'), 0);
     attrs.font = tAttrs.font || 'Helvetica, Arial';
     
     return attrs;

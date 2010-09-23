@@ -13,7 +13,7 @@ Sai.Image = Sai.Element.extend({
     attrs = attrs || {};
     
     // add the basic attrs
-    
+    attrs['stroke-width'] = Sai.isZeroOrValue(this.get('strokeWidth'), 0);
     return attrs;
   },
     

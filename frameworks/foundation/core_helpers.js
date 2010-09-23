@@ -540,6 +540,24 @@ Sai.mixin({
         alpha = (90 - Math.atan((mx - nx) / (my - ny)) * 180 / Math.PI);
     if (mx > nx || my < ny) alpha += 180;
     return {x: x, y: y, m: {x: mx, y: my}, n: {x: nx, y: ny}, start: {x: ax, y: ay}, end: {x: cx, y: cy}, alpha: alpha};
+  },
+  
+  
+  // ..........................................................
+  /** [jcd] if something needs to be 0, then 0||value will
+      return value in javascript. This simply allows 0 to return
+      true.
+      Example
+      Sai.isZeroOrValue(0,5) // returns 0
+      Sai.isZeroOrValue(null,5) // returns 5
+  */
+  //
+  isZeroOrValue: function (value, orValue) {
+    if ( SC.none(value) ) {
+      return orValue;
+    } else {
+      return (value === 0 || value === '0') ? 0 : value;
+    }
   }
 });
 

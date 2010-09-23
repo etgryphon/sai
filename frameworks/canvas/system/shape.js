@@ -13,8 +13,7 @@ Sai.Shape = Sai.Element.extend({
     // add the basic attrs
     attrs.fill = this.get('fill') || 'none';
     attrs.stroke = this.get('stroke') || 'none';
-    attrs['stroke-width'] = this.get('strokeWidth') || 1;
-    
+    attrs['stroke-width'] = Sai.isZeroOrValue(this.get('strokeWidth'), 0);
     return attrs;
   }
   
