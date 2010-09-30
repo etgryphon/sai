@@ -8,6 +8,21 @@ Sai.CanvasView = SC.View.extend({
   canvas: null,
   childElements: null,
   
+  _events: ['mouseDown', 'mouseUp'],
+  
+  init: function(){
+    sc_super();
+    this._events.forEach( function(eName){
+      this[eName] = function(evt){
+        var e, c = this.canvas, 
+            tId = evt.target.id;
+        e = c.getElementById(tId);
+        if (e && e[eName]) return e[eName](evt); 
+        return NO;
+      };
+    }, this);
+  },
+  
   didCreateLayer: function() {
     if (this.willCreateCanvas) this.willCreateCanvas();
     this.canvas = Sai.Canvas.create();

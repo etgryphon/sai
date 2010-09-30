@@ -8,7 +8,7 @@ Sai.Shape = Sai.Element.extend({
   strokeWidth: null,
   
   basicAttrs: function(attrs){
-    attrs = attrs || {};
+    attrs = sc_super();
     
     // add the basic attrs
     attrs.fill = this.get('fill') || 'none';

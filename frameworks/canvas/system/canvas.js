@@ -58,7 +58,8 @@ Sai.Canvas = SC.Object.extend({
   },
 
   element: function(elem, id){
-    if (elem.isClass) elem = elem.create();
+    id = id || this._generateId();
+    if (elem.isClass) elem = elem.create({id: id});
     this._addCanvasElement(elem, id);
     return elem;
   },
@@ -67,8 +68,10 @@ Sai.Canvas = SC.Object.extend({
     var circle;
     x = x || {};
     attrs = attrs || {};
+    id = id || this._generateId();
     
     circle = x.isCircle ? x : Sai.Circle.create({ 
+      id: id,
       x: x, 
       y: y, 
       radius: radius,
@@ -84,9 +87,12 @@ Sai.Canvas = SC.Object.extend({
   
   path: function(path, attrs, id) {
     var elem;
+    attrs = attrs || {};
     path = path || {};
+    id = id || this._generateId();
     
     elem = path.isPath ? path : Sai.Path.create({
+      id: id,
       stroke: attrs.stroke,
       strokeWidth: attrs.strokeWidth,
       path: path
@@ -100,8 +106,10 @@ Sai.Canvas = SC.Object.extend({
     var elem;
     x = x || {};
     attrs = attrs || {};
+    id = id || this._generateId();
     
     elem = x.isRectangle ? x : Sai.Rectangle.create({
+      id: id,
       x: x,
       y: y,
       width: width,
@@ -120,8 +128,10 @@ Sai.Canvas = SC.Object.extend({
     var elem;
     x = x || {};
     attrs = attrs || {};
+    id = id || this._generateId();
     
     elem = x.isText ? x : Sai.Text.create({
+      id: id,
       x: x,
       y: y,
       width: width,
@@ -159,6 +169,14 @@ Sai.Canvas = SC.Object.extend({
     element.set('id', id);
     this._elements[id] = element;
     this._orderedElements.pushObject(element);    
+  },
+  
+  _startId: 1,
+  
+  _generateId: function(){
+    var nId = 'sai%@'.fmt(this._startId); 
+    this._startId += 1;
+    return nId;
   }
   
 });
