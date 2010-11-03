@@ -79,6 +79,7 @@ Sai.LineChartView = Sai.AxisChartView.extend({
       // Calculate the coordinate system
       xa.coordMin = startX;
       xa.coordMax = endX;
+      xa.h = endY;
       xa.coordScale = (endX - startX) / (xa.max - xa.min);
       tCount = ~~((xa.max - xa.min) / xa.step);
       space = (endX - startX)/tCount;
@@ -88,6 +89,7 @@ Sai.LineChartView = Sai.AxisChartView.extend({
     if (ya){
       ya.coordMin = startY;
       ya.coordMax = endY;
+      ya.h = endX;
       ya.coordScale = (startY - endY) / (ya.max - ya.min);
       tCount = ~~((ya.max - ya.min) / ya.step);
       space = (startY - endY)/tCount;

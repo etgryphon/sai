@@ -198,6 +198,7 @@ Sai.BarChartView = Sai.AxisChartView.extend({
       // Calculate the coordinate system
       xa.coordMin = startX;
       xa.coordMax = endX;
+      xa.h = endY;
       aa = isHorizontal ? this._calcForLabelAlignment(xa, startX, endX, barGroups) : this._calcForBarAlignment(dLen, xa, startX, endX, barGroups.maxGroupNum);
       xa = aa[0]; tCount = aa[1];
       if (SC.none(xa.hidden) || !xa.hidden) this.makeAxis(canvas, startX, startY, endX, startY, xa, {direction: 'x', len: 5, start: barGroups.minHeight, count: tCount, space: xa.space, offset: xa.offset});
@@ -206,6 +207,7 @@ Sai.BarChartView = Sai.AxisChartView.extend({
     if (ya){
       ya.coordMin = startY;
       ya.coordMax = endY;
+      ya.h = endX;
       aa = isHorizontal ? this._calcForBarAlignment(dLen, ya, endY, startY, barGroups.maxGroupNum) : this._calcForLabelAlignment(ya, endY, startY, barGroups);
       ya = aa[0]; tCount = aa[1];
       if (SC.none(ya.hidden) || !ya.hidden) this.makeAxis(canvas, startX, startY, startX, endY, ya, {direction: 'y', len: 5, start: barGroups.minHeight, count: tCount, space: ya.space, offset: ya.offset});

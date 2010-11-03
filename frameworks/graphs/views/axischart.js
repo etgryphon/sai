@@ -7,12 +7,15 @@ Sai.AxisChartView = Sai.CanvasView.extend({
 
   makeAxis: function(canvas, sx, sy, ex, ey, axisAttrs, ticks){
     var path, i, len, dir, tLen, tickPts = {}, currTick, tickLabels = [],
-        space, tp, tOff, tickFunc, rounder = this.rounder, step, nextStep;
+        space, tp, tOff, tickFunc, rounder = this.rounder, step, nextStep, tmpStr,
+        grid, showGrid, gridDir;
     
     axisAttrs = axisAttrs || {};
     step = axisAttrs.step || 1;
+    showGrid = axisAttrs.showGrid;
     // Draw the line to the end
     path = 'M%@1,%@2L%@3,%@4M%@1,%@2'.fmt(rounder(sx), rounder(sy), rounder(ex), rounder(ey));
+    if (showGrid) grid = "M%@1,%@2".fmt(rounder(sx), rounder(sy));
     if (ticks){
 //      console.log('ticks: %@, space: %@, start: {x: %@, y: %@}, end: {x: %@, y: %@}'.fmt(ticks.count, ticks.space, sx, sy, ex, ey));
       dir = ticks.direction;
@@ -20,15 +23,18 @@ Sai.AxisChartView = Sai.CanvasView.extend({
       space = ticks.space;
       
       // Find the right tick intremental function based off of the axis (X or Y)
-      tickFunc = dir === 'x' ? function(x,y,sp){ return [x, (y+tLen), (x+sp), y]; } : function(x,y,sp){ return [(x-tLen), y, x, (y-sp)]; };
-      
+      tickFunc = dir === 'x' ? function(x,y,sp){ return [x, (y+tLen), (x+sp), y, axisAttrs.h]; } : function(x,y,sp){ return [(x-tLen), y, x, (y-sp), axisAttrs.h]; };
+      gridDir = dir === 'x' ? 'V' : 'H';
+
       // Some times you want to ofset the start of the ticks to center
       tOff = ticks.offset || 0;
       if (tOff > 0 && tOff < 1){
         tp = tickFunc(sx,sy,space*tOff);
         sx = tp[2];
         sy = tp[3];
-        path += 'M%@,%@'.fmt(rounder(sx), rounder(sy));
+        tmpStr = 'M%@,%@'.fmt(rounder(sx), rounder(sy));
+        path += tmpStr;
+        if (showGrid) grid += tmpStr;
       }
       
       // Draw all the ticks
@@ -40,6 +46,9 @@ Sai.AxisChartView = Sai.CanvasView.extend({
         sy = tp[3];
         currTick = {x: rounder(tp[0]), y: rounder(tp[1])};
         path += 'L%@,%@M%@,%@'.fmt(currTick.x, currTick.y, rounder(tp[2]), rounder(tp[3]));
+        if (showGrid) {
+          grid += '%@%@M%@,%@'.fmt(gridDir, rounder(tp[4]), rounder(tp[2]), rounder(tp[3]));
+        }
         tickPts[i] = {t: currTick, idx: nextStep};
         tickLabels.push(''+nextStep);
         nextStep += step;
@@ -52,6 +61,7 @@ Sai.AxisChartView = Sai.CanvasView.extend({
     if (!SC.none(axisAttrs.labels)) this.makeLabels(canvas, tickPts, axisAttrs, ticks, tickLabels);
     
     canvas.path(path, {stroke: axisAttrs.color || 'black', strokeWidth: axisAttrs.weight || 1}, '%@-axis'.fmt(dir));
+    if (showGrid) canvas.path(grid, {stroke: axisAttrs.gridColor || 'grey', strokeWidth: axisAttrs.weight || 1}, '%@-axis-grid'.fmt(dir));
   },
   
   makeLabels: function(canvas, tickPts, axisAttrs, ticks, tLabels){
