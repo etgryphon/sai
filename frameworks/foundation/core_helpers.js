@@ -558,6 +558,43 @@ Sai.mixin({
     } else {
       return (value === 0 || value === '0') ? 0 : value;
     }
+  },
+
+
+  autoscale: function (data) {
+    var ret = { min: null, max: null, step: null };
+    if (data.get('length') === 0) return ret;
+
+    var min = data.min();
+    var max = data.max();
+    var range = max - min;
+    ret = { min: min, max: max, step: 0 };
+
+    if (range === 0) return ret;
+
+    var log10 = function(x) { return Math.log(x)/Math.log(10); };
+    var oom = Math.floor(log10(range));
+    range *= Math.pow(10, -oom);
+    var tmp = (max-min)/range;
+    var maxt = Math.ceil(max/tmp)*tmp;
+    var mint = Math.floor(min/tmp)*tmp;
+    range = (max-min)/(maxt-mint);
+
+    if (range < 0.75) {
+      tmp *= 0.5;
+      maxt = Math.ceil(max/tmp)*tmp;
+      mint = Math.floor(min/tmp)*tmp;
+    }
+
+    ret.max = Math.round(maxt);
+    ret.min = Math.round(mint);
+
+    var numtick = Math.floor((maxt-mint)/tmp + 0.5);
+    if (numtick < 3) numtick = 4;
+
+    ret.step = Math.round((maxt-mint)/numtick*10)/10;
+
+    return ret;
   }
 });
 
