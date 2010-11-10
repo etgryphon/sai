@@ -33,7 +33,7 @@ Sai.Set = SC.Object.extend({
         len;
     for (var i = 0, ii = arguments.length; i < ii; i++) {
       item = arguments[i];
-      if (item) { // TODO: put back the check if item is Element or Set
+      if (item) { // TODO: [GD] put back the check if item is Element or Set
         len = this.items.length;
         this[len] = this.items[len] = item;
         this.length++;
