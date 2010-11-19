@@ -15,27 +15,9 @@ Sai.BarChartView = Sai.AxisChartView.extend({
   // Bar #2: "4, 5, 6"
   data: null,
 
-  dataArray: function() {
-    var ret = [],
-        data = this.get('data');
-    function walkArray(arr) {
-      if (arr && arr.isEnumerable) {
-        arr.forEach(function(item) {
-          if (item && item.isEnumerable) {
-            walkArray(item);
-          } else {
-            ret.push(item);
-          }
-        });
-      }
-    }
-    walkArray(data);
-    return ret;
-  }.property('data').cacheable(),
-
   /**
    *
-   * outOf - Will scale your restulds to this. eg 100, if you want to show your results as a percentage.
+   * max - Will scale your results to this. eg 100, if you want to show your results as a percentage.
    *
    * @example: {stacked: true, horizontal: true, colors: ['red' , 'blue', 'green']}
    * @param: dataAttrs - Hash of styling parameters
@@ -76,9 +58,10 @@ Sai.BarChartView = Sai.AxisChartView.extend({
     var x, xBase, bWidth = dAttrs.barWidth || 16, xSpace = xaxis.space,
         xOffset = (xSpace*xaxis.offset), y, 
         bHeight, bSpacing = dAttrs.barSpacing || 0,
-        colors = dAttrs.color || dAttrs.colors || 'blue',
+        colors = dAttrs.color || dAttrs.colors || 'blue', color,
+        colorIsArray = (SC.typeOf(colors) === SC.T_ARRAY),
         gmn = xaxis.maxGroupNum;
-    
+    if (colorIsArray) var clen = colors.length ;
     xBase = xaxis.coordMin;
     d.forEach( function(series, i){
       xBase += xSpace;
@@ -86,27 +69,31 @@ Sai.BarChartView = Sai.AxisChartView.extend({
       if (SC.typeOf(series) === SC.T_ARRAY){
         x -= ((gmn*bWidth) + ((gmn-1)*bSpacing))/2;
         series.forEach( function(bar, j){
-          bHeight = yaxis.coordScale*bar;
+          bHeight = yaxis.coordScale*(bar-yaxis.heightStart);
+          color = colorIsArray ? colors[j%clen] : colors ;
           y = yaxis.coordMin-bHeight;
-          canvas.rectangle(~~x, ~~y, bWidth, ~~bHeight, 0, {stroke: colors[j], fill: colors[j]}, 'bar-%@-%@'.fmt(i,j));
+          canvas.rectangle(~~x, ~~y, bWidth, ~~bHeight, 0, {stroke: color, fill: color}, 'bar-%@-%@'.fmt(i,j));
           x += bWidth+bSpacing;
         });
       }
       else {
-        x -= (bWidth/2); 
-        bHeight = yaxis.coordScale*series;
+        x -= (bWidth/2);
+        bHeight = yaxis.coordScale*(series-yaxis.heightStart);
         y = yaxis.coordMin-bHeight;
-        canvas.rectangle(~~x, ~~y, bWidth, ~~bHeight, 0, {stroke: colors, fill: colors}, 'bar-%@'.fmt(i));
+        color = colorIsArray ? colors[i%clen] : colors ;
+        canvas.rectangle(~~x, ~~y, bWidth, ~~bHeight, 0, {stroke: color, fill: color}, 'bar-%@'.fmt(i));
       }
     });
   },
-  
+
   _processDataAsHRegularBarGraph: function(f, canvas, d, dAttrs, xaxis, yaxis){
     var y, yBase, bHeight = dAttrs.barWidth || 16, ySpace = yaxis.space,
-        yOffset = (ySpace*yaxis.offset), x, 
+        yOffset = (ySpace*yaxis.offset), x,
         bWidth, bSpacing = dAttrs.barSpacing || 0,
-        colors = dAttrs.color || dAttrs.colors || 'blue',
+        colors = dAttrs.color || dAttrs.colors || 'blue', color,
+        colorIsArray = (SC.typeOf(colors) === SC.T_ARRAY),
         gmn = yaxis.maxGroupNum, gmnStart = ((gmn*bHeight) + ((gmn-1)*bSpacing))/2;
+    if (colorIsArray) var clen = colors.length ;
     yBase = yaxis.coordMin;
     x = xaxis.coordMin;
     d.forEach( function(series, i){
@@ -115,71 +102,79 @@ Sai.BarChartView = Sai.AxisChartView.extend({
       if (SC.typeOf(series) === SC.T_ARRAY){
         y -= gmnStart;
         series.forEach( function(bar, j){
-          bWidth = xaxis.coordScale*bar;
-          canvas.rectangle(x, ~~y, bWidth, bHeight, 0, {stroke: colors[j], fill: colors[j]}, 'bar-%@-%@'.fmt(i,j));
+          bWidth = xaxis.coordScale*(bar-xaxis.heightStart);
+          color = colorIsArray ? colors[j%clen] : colors ;
+          canvas.rectangle(x, ~~y, bWidth, bHeight, 0, {stroke: color, fill: color}, 'bar-%@-%@'.fmt(i,j));
           y += bHeight+bSpacing;
         });
       }
       else {
-        y -= (bHeight/2); 
-        bWidth = xaxis.coordScale*series;
-        canvas.rectangle(x, ~~y, ~~bWidth, bHeight, 0, {stroke: colors, fill: colors}, 'bar-%@'.fmt(i));
+        y -= (bHeight/2);
+        bWidth = xaxis.coordScale*(series-xaxis.heightStart);
+        color = colorIsArray ? colors[i%clen] : colors ;
+        canvas.rectangle(x, ~~y, ~~bWidth, bHeight, 0, {stroke: color, fill: color}, 'bar-%@'.fmt(i));
       }
     });
   },
-  
+
   _processDataAsVStackedBarGraph: function(f, canvas, d, dAttrs, xaxis, yaxis){
     // TODO: [EG] Stacked bar graph
     var x, xBase, bWidth = dAttrs.barWidth || 16, xSpace = xaxis.space,
-        xOffset = (xSpace*xaxis.offset), y, 
+        xOffset = (xSpace*xaxis.offset), y,
         bHeight, bSpacing = dAttrs.barSpacing || 0,
-        colors = dAttrs.color || dAttrs.colors || 'blue';
-    
+        colors = dAttrs.color || dAttrs.colors || 'blue', color,
+        colorIsArray = (SC.typeOf(colors) === SC.T_ARRAY);
+    if (colorIsArray) var clen = colors.length ;
     xBase = xaxis.coordMin;
     d.forEach( function(series, i){
       xBase += xSpace;
       x = xBase - xOffset;
-      x -= (bWidth/2); 
+      x -= (bWidth/2);
       if (SC.typeOf(series) === SC.T_ARRAY){
         y = yaxis.coordMin;
         series.forEach( function(bar, j){
           bHeight = yaxis.coordScale*bar;
           y = y-bHeight;
-          canvas.rectangle(~~x, ~~y, bWidth, ~~bHeight, 0, {stroke: colors[j], fill: colors[j]}, 'bar-%@-%@'.fmt(i,j));
+          color = colorIsArray ? colors[j%clen] : colors ;
+          canvas.rectangle(~~x, ~~y, bWidth, ~~bHeight, 0, {stroke: color, fill: color}, 'bar-%@-%@'.fmt(i,j));
         });
       }
       else {
         bHeight = yaxis.coordScale*series;
         y = yaxis.coordMin-bHeight;
-        canvas.rectangle(~~x, ~~y, bWidth, ~~bHeight, 0, {stroke: colors, fill: colors}, 'bar-%@'.fmt(i));
+        color = colorIsArray ? colors[i%clen] : colors ;
+        canvas.rectangle(~~x, ~~y, bWidth, ~~bHeight, 0, {stroke: color, fill: color}, 'bar-%@'.fmt(i));
       }
     });
   },
-  
+
   _processDataAsHStackedBarGraph: function(f, canvas, d, dAttrs, xaxis, yaxis){
     // TODO: [EG] Stacked bar graph
     var y, yBase, bHeight = dAttrs.barWidth || 16, ySpace = yaxis.space,
-        yOffset = (ySpace*yaxis.offset), x, 
+        yOffset = (ySpace*yaxis.offset), x,
         bWidth, bSpacing = dAttrs.barSpacing || 0,
-        colors = dAttrs.color || dAttrs.colors || 'blue';
-    
+        colors = dAttrs.color || dAttrs.colors || 'blue', color,
+        colorIsArray = (SC.typeOf(colors) === SC.T_ARRAY);
+    if (colorIsArray) var clen = colors.length ;
     yBase = yaxis.coordMin;
     d.forEach( function(series, i){
       yBase -= ySpace;
       y = yBase + yOffset;
-      y -= (bHeight/2); 
+      y -= (bHeight/2);
       if (SC.typeOf(series) === SC.T_ARRAY){
         x = xaxis.coordMin;
         series.forEach( function(bar, j){
           bWidth = xaxis.coordScale*bar;
-          canvas.rectangle(~~x, ~~y, ~~bWidth, bHeight, 0, {stroke: colors[j], fill: colors[j]}, 'bar-%@-%@'.fmt(i,j));
+          color = colorIsArray ? colors[j%clen] : colors ;
+          canvas.rectangle(~~x, ~~y, ~~bWidth, bHeight, 0, {stroke: color, fill: color}, 'bar-%@-%@'.fmt(i,j));
           x += bWidth;
         });
       }
       else {
         bHeight = xaxis.coordScale*series;
         x = xaxis.coordMin-bHeight;
-        canvas.rectangle(~~x, ~~y, bWidth, ~~bHeight, 0, {stroke: colors, fill: colors}, 'bar-%@'.fmt(i));
+        color = colorIsArray ? colors[i%clen] : colors ;
+        canvas.rectangle(~~x, ~~y, bWidth, ~~bHeight, 0, {stroke: color, fill: color}, 'bar-%@'.fmt(i));
       }
     });
   },
@@ -239,10 +234,16 @@ Sai.BarChartView = Sai.AxisChartView.extend({
     hasStepCount = !SC.none(axis.steps);
 
     axis.coordScale = (end - start) / maxHeight;
-    
-    if(!hasStepIncrement && !hasStepCount){ // use the auto scale steps
-      tCount = ~~((barGroups.maxHeight - barGroups.minHeight)/barGroups.step);
-      axis.step = barGroups.step;
+    axis.heightStart = barGroups.minHeight;
+
+    if(!hasStepIncrement && !hasStepCount){
+      if (barGroups.step) { // use the auto scale steps if a valiable
+        tCount = ~~((barGroups.maxHeight - barGroups.minHeight)/barGroups.step);
+        axis.step = barGroups.step;
+      } else { // make and educated guess with 10 tick marks
+        tCount = 10;
+        axis.step = ~~(maxHeight/tCount);
+      }
     } else if(hasStepCount){ // use a total count of X
       tCount = axis.steps;
       axis.step = ~~((barGroups.maxHeight - barGroups.minHeight)/tCount);
@@ -258,47 +259,67 @@ Sai.BarChartView = Sai.AxisChartView.extend({
     return [axis, tCount];
   },
   
-  _calculateBarGroups: function(d, isStacked){
+  _calculateBarGroups: function(data, isStacked){
     var ret = {maxGroupNum: 0, maxHeight: 0, minHeight: 0, step: 0}, mmax = Math.max,
-        tmpMax = 0, tmpLen = 0, totalHeights = [],
-        outOf = this.get('dataAttrs').outOf, autoScale;
-    d = d || [];
+        tmpMax = 0, tmpLen = 0, autoScale,
+        da = this.get('dataAttrs'), useAS = !!da.autoscale,
+        max = da.max, min = da.min,
+        d = data ? SC.clone(data) : [];
     if(isStacked){
       ret.maxGroupNum = 1;
-      if (SC.typeOf(d[0]) === SC.T_ARRAY){
+      if (SC.typeOf(data[0]) === SC.T_ARRAY){
         // Find the Max Value and total group number
-        d.forEach( function(data){
-          tmpMax = 0;
-          data.forEach( function(x){ tmpMax += x; });
-          totalHeights.push(tmpMax);
-        });
-        if (outOf) { totalHeights.push(0) }
-        autoScale = Sai.autoscale(totalHeights);
-        console.log("Stacked Autoscale", autoScale);
+        d = [];
+        if (max) {
+          d.push(max)
+        } else {
+          data.forEach( function(o){
+            tmpMax = 0;
+            o.forEach( function(x){ tmpMax += x; });
+            d.push(tmpMax);
+          });
+        }
+        d.push(0);
       }
       else {
-        autoScale = Sai.autoscale(SC.clone(d).push(0));
+        d.push(0);
+        if (max) { d.push(max); }
       }
     }
     else {
       if (SC.typeOf(d[0]) === SC.T_ARRAY){
         // Find the Max Value and total group number
-        d.forEach( function(data){
-          tmpLen = data.length || 0;
-          ret.maxGroupNum = ret.maxGroupNum < tmpLen ? tmpLen : ret.maxGroupNum;
-          totalHeights.pushObjects(data);
-        });
-        autoScale = Sai.autoscale(totalHeights);
+        d = [];
+        if (max) {
+          d.push(max)
+        } else {
+          data.forEach( function(o){
+            tmpLen = o.length || 0;
+            ret.maxGroupNum = ret.maxGroupNum < tmpLen ? tmpLen : ret.maxGroupNum;
+            d.pushObjects(o);
+          });
+        }
+        if (min || min === 0) { d.push(min); }
+        if (max) { d.push(max); }
       }
       else {
-        autoScale = Sai.autoscale(d);
+        d = SC.clone(d);
+        if (min || min === 0) { d.push(min); }
+        if (max) { d.push(max); }
         ret.maxGroupNum = d.length || 0;
       }
     }
 
-    ret.maxHeight = autoScale.max;
-    ret.minHeight = autoScale.min;
-    ret.step      = autoScale.step;
+    if (useAS) {
+      autoScale = Sai.autoscale(d);
+      ret.maxHeight = autoScale.max;
+      ret.minHeight = autoScale.min;
+      ret.step      = autoScale.step;
+    } else {
+      var dmax = d.max();
+      ret.maxHeight = max && (max > dmax) ? max : dmax;
+      ret.minHeight = min || 0;
+    }
 
     return ret;
   }
