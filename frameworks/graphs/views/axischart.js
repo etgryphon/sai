@@ -7,7 +7,7 @@ Sai.AxisChartView = Sai.CanvasView.extend({
 
   makeAxis: function(canvas, sx, sy, ex, ey, axisAttrs, ticks){
     var path, i, len, dir, tLen, tickPts = {}, currTick, tickLabels = [],
-        space, tp, tOff, tickFunc, rounder = this.rounder, step;
+        space, tp, tOff, tickFunc, rounder = this.rounder, step, nextStep;
     
     axisAttrs = axisAttrs || {};
     step = axisAttrs.step || 1;
@@ -32,17 +32,21 @@ Sai.AxisChartView = Sai.CanvasView.extend({
       }
       
       // Draw all the ticks
-      for(i = ticks.start || 0, len = ticks.count; i < len; i++){
+      nextStep = ticks.start;
+//      console.log("Drawing Ticks: start:", ticks.start);
+      for(i = 0, len = ticks.count; i < len; i++){
         tp = tickFunc(sx,sy,space);
         sx = tp[2];
         sy = tp[3];
         currTick = {x: rounder(tp[0]), y: rounder(tp[1])};
         path += 'L%@,%@M%@,%@'.fmt(currTick.x, currTick.y, rounder(tp[2]), rounder(tp[3]));
-        tickPts[i] = {t: currTick, idx: i*step};
-        tickLabels.push(''+i*step);
+        tickPts[i] = {t: currTick, idx: nextStep};
+        tickLabels.push(''+nextStep);
+        nextStep += step;
       }
+//      console.log(SC.inspect(tickPts));
     }
-    //console.log('Axis Path: '+path);
+//    console.log('Axis Path: '+path, dir);
     
     // Do Labels
     if (!SC.none(axisAttrs.labels)) this.makeLabels(canvas, tickPts, axisAttrs, ticks, tickLabels);
