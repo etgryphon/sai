@@ -561,24 +561,42 @@ Sai.mixin({
   },
 
 
-  autoscale: function (data) {
-    var ret = { min: null, max: null, step: null };
+  autoscale: function (data, useMax, useMin) {
+    var ret = { min: null, max: null, step: null },
+        mint, maxt, tmp, log10, range, min, max,
+        oom, diff, numtick, findFactors, factors;
     if (data.get('length') === 0) return ret;
+    if (!useMax) useMax = NO;
+    if (!useMin) useMin = NO;
+    console.log("START");
 
-    var min = data.min();
-    var max = data.max();
-    var range = max - min;
+    min = data.min();
+    max = data.max();
+    range = diff = max - min;
+    console.log("range", range);
     ret = { min: min, max: max, step: 0 };
 
     if (range === 0) return ret;
 
-    var log10 = function(x) { return Math.log(x)/Math.log(10); };
-    var oom = Math.floor(log10(range));
+    log10 = function(x) { return Math.log(x)/Math.log(10); };
+    findFactors = function(num, max) {
+      var i, inn, outt, factors = [];
+      if (!max) {max=10;} //max number of ticks
+      for (i = 2; i < max; i++) {
+        inn = Math.round(num / i);
+        outt = (num / i);
+        if (inn === outt && inn > i) factors.push([outt, i]);
+      }
+      return factors;
+    };
+    oom = Math.floor(log10(range));
     range *= Math.pow(10, -oom);
-    var tmp = (max-min)/range;
-    var maxt = Math.ceil(max/tmp)*tmp;
-    var mint = Math.floor(min/tmp)*tmp;
-    range = (max-min)/(maxt-mint);
+    console.log("range", range);
+    tmp = (diff)/range;
+    console.log("tmp", tmp);
+    maxt = Math.ceil(max/tmp)*tmp;
+    mint = Math.floor(min/tmp)*tmp;
+    range = (diff)/(maxt-mint);
 
     if (range < 0.75) {
       tmp *= 0.5;
@@ -589,9 +607,20 @@ Sai.mixin({
     ret.max = Math.round(maxt);
     ret.min = Math.round(mint);
 
-    var numtick = Math.floor((maxt-mint)/tmp + 0.5);
-    if (numtick < 3) numtick = 4;
+    if (useMax || useMin) {
+      if (useMax) ret.max = Math.round(max);
+      if (useMin) ret.max = Math.round(min);
+      factors = findFactors(ret.max-ret.min);
+      if (factors) factors = factors.objectAt(factors.length-1);
+      if (factors && factors[1] > 3) {
+        numtick = factors[1];
+        ret.step = factors[0];
+        return ret;
+      }
+    }
 
+    numtick = Math.floor((maxt-mint)/tmp + 0.5);
+    if (numtick <= 3) numtick = 4;
     ret.step = Math.round((maxt-mint)/numtick*10)/10;
 
     return ret;

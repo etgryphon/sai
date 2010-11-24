@@ -311,7 +311,7 @@ Sai.BarChartView = Sai.AxisChartView.extend({
     }
 
     if (useAS) {
-      autoScale = Sai.autoscale(d);
+      autoScale = Sai.autoscale(d, !!max, !!min);
       ret.maxHeight = autoScale.max;
       ret.minHeight = autoScale.min;
       ret.step      = autoScale.step;
