@@ -192,7 +192,7 @@ Sai.BarChartView = Sai.AxisChartView.extend({
         endY = f.height*0.05, dLen = d.length || 0;
         
     
-    barGroups = this._calculateBarGroups(d, isStacked);
+    barGroups = this._calculateBarGroups(d, isStacked, isHorizontal?xa:ya);
     // X Axis
     if (xa){
       // Calculate the coordinate system
@@ -259,11 +259,11 @@ Sai.BarChartView = Sai.AxisChartView.extend({
     return [axis, tCount];
   },
   
-  _calculateBarGroups: function(data, isStacked){
+  _calculateBarGroups: function(data, isStacked, axis){
     var ret = {maxGroupNum: 0, maxHeight: 0, minHeight: 0, step: 0}, mmax = Math.max,
         tmpMax = 0, tmpLen = 0, autoScale,
-        da = this.get('dataAttrs'), useAS = !!da.autoscale,
-        max = da.max, min = da.min,
+        useAS = !!axis.autoscale,
+        max = axis.max, min = axis.min,
         d = data ? SC.clone(data) : [];
     if(isStacked){
       ret.maxGroupNum = 1;
