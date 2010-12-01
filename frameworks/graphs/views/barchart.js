@@ -227,18 +227,18 @@ Sai.BarChartView = Sai.AxisChartView.extend({
   },
   
   _calcForLabelAlignment: function(axis, start, end, barGroups){
-    var tCount, hasStepIncrement, hasStepCount,
-        maxHeight = barGroups.maxHeight;
+    var tCount, hasStepIncrement, hasStepCount, tMax,
+        maxHeight = barGroups.maxHeight,
+        minHeight = barGroups.minHeight;
     axis = axis || {};
     hasStepIncrement = !SC.none(axis.step);
     hasStepCount = !SC.none(axis.steps);
 
-    axis.coordScale = (end - start) / maxHeight;
     axis.heightStart = barGroups.minHeight;
 
     if(!hasStepIncrement && !hasStepCount){
-      if (barGroups.step) { // use the auto scale steps if a valiable
-        tCount = ~~((barGroups.maxHeight - barGroups.minHeight)/barGroups.step);
+      if (barGroups.step) { // use the auto scale steps if available
+        tCount = ~~((maxHeight - minHeight)/barGroups.step);
         axis.step = barGroups.step;
       } else { // make and educated guess with 10 tick marks
         tCount = 10;
@@ -246,12 +246,26 @@ Sai.BarChartView = Sai.AxisChartView.extend({
       }
     } else if(hasStepCount){ // use a total count of X
       tCount = axis.steps;
-      axis.step = ~~((barGroups.maxHeight - barGroups.minHeight)/tCount);
+      axis.step = ~~((maxHeight - minHeight)/tCount);
     } else { // Use step increments of X
-      tCount = ~~((barGroups.maxHeight - barGroups.minHeight) / axis.step);
+      tCount = Math.ceil((maxHeight - minHeight) / axis.step);
+      axis.max = axis.step * tCount;
     }
-    
-    axis.space = (end - start)/tCount;
+
+    /*
+     if we have the right data, calculate the correct spacing for if our
+     highest tick number is less then out max axis value. so that our axis
+     can go higher than the ticks.
+    */
+    if (axis && axis.step && axis.max) {
+      tMax = axis.step * tCount;
+      axis.space = (((end - start) / axis.max) * tMax) / tCount;
+    } else {
+      axis.space = (end - start)/tCount;
+    }
+
+    axis.coordScale = (end - start) / [maxHeight,axis.max].max();
+
     tCount += 1; // add the last tick to the line
     axis.offset = 0;
     

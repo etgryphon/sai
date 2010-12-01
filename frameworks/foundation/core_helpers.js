@@ -568,12 +568,10 @@ Sai.mixin({
     if (data.get('length') === 0) return ret;
     if (!useMax) useMax = NO;
     if (!useMin) useMin = NO;
-    console.log("START");
 
     min = data.min();
     max = data.max();
     range = diff = max - min;
-    console.log("range", range);
     ret = { min: min, max: max, step: 0 };
 
     if (range === 0) return ret;
@@ -591,9 +589,7 @@ Sai.mixin({
     };
     oom = Math.floor(log10(range));
     range *= Math.pow(10, -oom);
-    console.log("range", range);
     tmp = (diff)/range;
-    console.log("tmp", tmp);
     maxt = Math.ceil(max/tmp)*tmp;
     mint = Math.floor(min/tmp)*tmp;
     range = (diff)/(maxt-mint);
@@ -612,7 +608,7 @@ Sai.mixin({
       if (useMin) ret.max = Math.round(min);
       factors = findFactors(ret.max-ret.min);
       if (factors) factors = factors.objectAt(factors.length-1);
-      if (factors && factors[1] > 3) {
+      if (factors && factors[1] > 3 && factors[0]%5===0) {
         numtick = factors[1];
         ret.step = factors[0];
         return ret;
