@@ -8,12 +8,16 @@ Sai.CanvasView = SC.View.extend({
   canvas: null,
   childElements: null,
   
-  _events: ['mouseDown', 'mouseUp'],
+  _events: ['mouseDown', 'mouseUp',
+    'mouseDragged', 'mouseEntered', 'mouseOut', 'mouseMoved',
+    'click', 'doubleClick', 'mouseWheel'
+  ],
   
   init: function(){
     sc_super();
     this._events.forEach( function(eName){
       this[eName] = function(evt){
+        // console.log('Triggering Event %@'.fmt(eName));
         var e, c = this.canvas, 
             tId = evt.target.id;
         e = c.getElementById(tId);

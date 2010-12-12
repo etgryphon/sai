@@ -155,7 +155,7 @@ Sai.Canvas = SC.Object.extend({
   },
   
   getElementById: function(id) {
-    return this._elements[id];
+    return this._elements ? this._elements[id] : null;
   },
   
   getElementByIndex: function(idx) {
