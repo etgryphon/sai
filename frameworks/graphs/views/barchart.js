@@ -53,9 +53,11 @@ Sai.BarChartView = Sai.AxisChartView.extend({
     var x, xBase, bWidth = dAttrs.barWidth || 16, xSpace = xaxis.space,
         xOffset = (xSpace*xaxis.offset), y, 
         bHeight, bSpacing = dAttrs.barSpacing || 0,
-        colors = dAttrs.color || dAttrs.colors || 'blue',
+        colors = dAttrs.color || dAttrs.colors || 'blue', color, clen,
+        colorIsArray = (SC.typeOf(colors) === SC.T_ARRAY),
         gmn = xaxis.maxGroupNum;
-    
+
+    if (colorIsArray) clen = colors.length ;
     xBase = xaxis.coordMin;
     d.forEach( function(series, i){
       xBase += xSpace;
@@ -65,7 +67,8 @@ Sai.BarChartView = Sai.AxisChartView.extend({
         series.forEach( function(bar, j){
           bHeight = yaxis.coordScale*bar;
           y = yaxis.coordMin-bHeight;
-          canvas.rectangle(~~x, ~~y, bWidth, ~~bHeight, 0, {stroke: colors[j], fill: colors[j]}, 'bar-%@-%@'.fmt(i,j));
+          color = colorIsArray ? colors[j%clen] : colors ;
+          canvas.rectangle(~~x, ~~y, bWidth, ~~bHeight, 0, {stroke: color, fill: color}, 'bar-%@-%@'.fmt(i,j));
           x += bWidth+bSpacing;
         });
       }
@@ -73,7 +76,8 @@ Sai.BarChartView = Sai.AxisChartView.extend({
         x -= (bWidth/2); 
         bHeight = yaxis.coordScale*series;
         y = yaxis.coordMin-bHeight;
-        canvas.rectangle(~~x, ~~y, bWidth, ~~bHeight, 0, {stroke: colors, fill: colors}, 'bar-%@'.fmt(i));
+        color = colorIsArray ? colors[i%clen] : colors ;
+        canvas.rectangle(~~x, ~~y, bWidth, ~~bHeight, 0, {stroke: color, fill: color}, 'bar-%@'.fmt(i));
       }
     });
   },
@@ -82,8 +86,11 @@ Sai.BarChartView = Sai.AxisChartView.extend({
     var y, yBase, bHeight = dAttrs.barWidth || 16, ySpace = yaxis.space,
         yOffset = (ySpace*yaxis.offset), x, 
         bWidth, bSpacing = dAttrs.barSpacing || 0,
-        colors = dAttrs.color || dAttrs.colors || 'blue',
+        colors = dAttrs.color || dAttrs.colors || 'blue', color, clen,
+        colorIsArray = (SC.typeOf(colors) === SC.T_ARRAY),
         gmn = yaxis.maxGroupNum, gmnStart = ((gmn*bHeight) + ((gmn-1)*bSpacing))/2;
+
+    if (colorIsArray) clen = colors.length ;
     yBase = yaxis.coordMin;
     x = xaxis.coordMin;
     d.forEach( function(series, i){
@@ -93,14 +100,16 @@ Sai.BarChartView = Sai.AxisChartView.extend({
         y -= gmnStart;
         series.forEach( function(bar, j){
           bWidth = xaxis.coordScale*bar;
-          canvas.rectangle(x, ~~y, bWidth, bHeight, 0, {stroke: colors[j], fill: colors[j]}, 'bar-%@-%@'.fmt(i,j));
+          color = colorIsArray ? colors[j%clen] : colors ;
+          canvas.rectangle(x, ~~y, bWidth, bHeight, 0, {stroke: color, fill: color}, 'bar-%@-%@'.fmt(i,j));
           y += bHeight+bSpacing;
         });
       }
       else {
         y -= (bHeight/2); 
         bWidth = xaxis.coordScale*series;
-        canvas.rectangle(x, ~~y, ~~bWidth, bHeight, 0, {stroke: colors, fill: colors}, 'bar-%@'.fmt(i));
+        color = colorIsArray ? colors[i%clen] : colors ;
+        canvas.rectangle(x, ~~y, ~~bWidth, bHeight, 0, {stroke: color, fill: color}, 'bar-%@'.fmt(i));
       }
     });
   },
@@ -110,8 +119,10 @@ Sai.BarChartView = Sai.AxisChartView.extend({
     var x, xBase, bWidth = dAttrs.barWidth || 16, xSpace = xaxis.space,
         xOffset = (xSpace*xaxis.offset), y, 
         bHeight, bSpacing = dAttrs.barSpacing || 0,
-        colors = dAttrs.color || dAttrs.colors || 'blue';
-    
+        colors = dAttrs.color || dAttrs.colors || 'blue', color, clen,
+        colorIsArray = (SC.typeOf(colors) === SC.T_ARRAY);
+
+    if (colorIsArray) clen = colors.length ;
     xBase = xaxis.coordMin;
     d.forEach( function(series, i){
       xBase += xSpace;
@@ -122,13 +133,15 @@ Sai.BarChartView = Sai.AxisChartView.extend({
         series.forEach( function(bar, j){
           bHeight = yaxis.coordScale*bar;
           y = y-bHeight;
-          canvas.rectangle(~~x, ~~y, bWidth, ~~bHeight, 0, {stroke: colors[j], fill: colors[j]}, 'bar-%@-%@'.fmt(i,j));
+          color = colorIsArray ? colors[j%clen] : colors ;
+          canvas.rectangle(~~x, ~~y, bWidth, ~~bHeight, 0, {stroke: color, fill: color}, 'bar-%@-%@'.fmt(i,j));
         });
       }
       else {
         bHeight = yaxis.coordScale*series;
         y = yaxis.coordMin-bHeight;
-        canvas.rectangle(~~x, ~~y, bWidth, ~~bHeight, 0, {stroke: colors, fill: colors}, 'bar-%@'.fmt(i));
+        color = colorIsArray ? colors[i%clen] : colors ;
+        canvas.rectangle(~~x, ~~y, bWidth, ~~bHeight, 0, {stroke: color, fill: color}, 'bar-%@'.fmt(i));
       }
     });
   },
@@ -138,8 +151,10 @@ Sai.BarChartView = Sai.AxisChartView.extend({
     var y, yBase, bHeight = dAttrs.barWidth || 16, ySpace = yaxis.space,
         yOffset = (ySpace*yaxis.offset), x, 
         bWidth, bSpacing = dAttrs.barSpacing || 0,
-        colors = dAttrs.color || dAttrs.colors || 'blue';
-    
+        colors = dAttrs.color || dAttrs.colors || 'blue', color, clen,
+        colorIsArray = (SC.typeOf(colors) === SC.T_ARRAY);
+
+    if (colorIsArray) clen = colors.length ;
     yBase = yaxis.coordMin;
     d.forEach( function(series, i){
       yBase -= ySpace;
@@ -149,14 +164,16 @@ Sai.BarChartView = Sai.AxisChartView.extend({
         x = xaxis.coordMin;
         series.forEach( function(bar, j){
           bWidth = xaxis.coordScale*bar;
-          canvas.rectangle(~~x, ~~y, ~~bWidth, bHeight, 0, {stroke: colors[j], fill: colors[j]}, 'bar-%@-%@'.fmt(i,j));
+          color = colorIsArray ? colors[j%clen] : colors ;
+          canvas.rectangle(~~x, ~~y, ~~bWidth, bHeight, 0, {stroke: color, fill: color}, 'bar-%@-%@'.fmt(i,j));
           x += bWidth;
         });
       }
       else {
         bHeight = xaxis.coordScale*series;
         x = xaxis.coordMin-bHeight;
-        canvas.rectangle(~~x, ~~y, bWidth, ~~bHeight, 0, {stroke: colors, fill: colors}, 'bar-%@'.fmt(i));
+        color = colorIsArray ? colors[i%clen] : colors ;
+        canvas.rectangle(~~x, ~~y, bWidth, ~~bHeight, 0, {stroke: color, fill: color}, 'bar-%@'.fmt(i));
       }
     });
   },
