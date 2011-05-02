@@ -258,3 +258,4 @@ Sai.PieChartView = Sai.CanvasView.extend(
   }
 
 });
+

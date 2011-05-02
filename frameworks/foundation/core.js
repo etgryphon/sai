@@ -76,3 +76,4 @@ Sai = SC.Object.create({
     return colours ;
   }.property().cacheable()
 });
+
