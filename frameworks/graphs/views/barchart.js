@@ -240,7 +240,7 @@ Sai.BarChartView = Sai.AxisChartView.extend({
       tCount = axis.steps;
       axis.step = ~~(maxHeight/tCount);
     } else { // Use step increments of X
-      tCount = ~~(maxHeight / axis.step);
+      tCount = axis.step ? ~~(maxHeight / axis.step) : 1;
     }
     
     axis.space = (end - start)/tCount;
