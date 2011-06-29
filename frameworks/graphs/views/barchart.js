@@ -35,6 +35,7 @@ Sai.BarChartView = Sai.AxisChartView.extend({
         d = this.get('data') || [],
         dAttrs = this.get('dataAttrs') || {stacked: NO, horizontal: NO, colors: 'black'},
         f = this.get('frame'), axis;
+      
     if(d.length === 0) return;
 
     if (!firstTime) canvas.clear();  
@@ -189,14 +190,15 @@ Sai.BarChartView = Sai.AxisChartView.extend({
         // Y coordinate stuff
         startY = f.height*(1.0 - xBuffer),
         endY = f.height*0.05, dLen = d.length || 0;
-        
     
     barGroups = this._calculateBarGroups(d, isStacked);
+  
     // X Axis
     if (xa){
       // Calculate the coordinate system
       xa.coordMin = startX;
       xa.coordMax = endX;
+      
       aa = isHorizontal ? this._calcForLabelAlignment(xa, startX, endX, barGroups.maxHeight) : this._calcForBarAlignment(dLen, xa, startX, endX, barGroups.maxGroupNum);
       xa = aa[0]; tCount = aa[1];
       if (SC.none(xa.hidden) || !xa.hidden) this.makeAxis(canvas, startX, startY, endX, startY, xa, {direction: 'x', len: 5, count: tCount, space: xa.space, offset: xa.offset});
@@ -228,19 +230,21 @@ Sai.BarChartView = Sai.AxisChartView.extend({
   _calcForLabelAlignment: function(axis, start, end, maxHeight){
     var tCount, hasStepIncrement, hasStepCount;
     axis = axis || {};
-    hasStepIncrement = !SC.none(axis.step);
+    hasStepIncrement = axis.step; // NOTE: This is FALSEY if axis.step equals 0, null or undefined
     hasStepCount = !SC.none(axis.steps);
 
     axis.coordScale = (end - start) / maxHeight;
     
-    if(!hasStepIncrement && !hasStepCount){ // make and educated guess with 25 tick marks
-      tCount = 25;
+    
+    if(!hasStepIncrement && !hasStepCount){ // make and educated guess with 10 tick marks
+      tCount = maxHeight > 10 ? 10 : maxHeight;
       axis.step = ~~(maxHeight/tCount);
     } else if(hasStepCount){ // use a total count of X
       tCount = axis.steps;
       axis.step = ~~(maxHeight/tCount);
+      axis.step = axis.step || 1;
     } else { // Use step increments of X
-      tCount = axis.step ? ~~(maxHeight / axis.step) : 1;
+      tCount = axis.step ? ~~(maxHeight / axis.step) : maxHeight;
     }
     
     axis.space = (end - start)/tCount;
