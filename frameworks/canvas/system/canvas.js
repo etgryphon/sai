@@ -150,6 +150,7 @@ Sai.Canvas = SC.Object.extend({
     if (!element) return;
     var oe = oes || this._orderedElements;
     if (oe) oe.removeObject(element);
+    if (SC.none(this._elements)) return;
     delete this._elements[element.get('id')];
     element.destroy();
   },
